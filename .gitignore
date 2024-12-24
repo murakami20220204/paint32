@@ -1,0 +1,25 @@
+# Git Ignore
+
+# Directories
+.vs/
+.vscode/
+ARM/
+ARM64/
+bin/
+obj/
+Debug/
+Generated Files/
+Release/
+x64/
+x86/
+
+# Extensions
+*.aps
+*.suo
+*.user
+*_h.h
+*_i.c
+*_p.c
+
+# Files
+dlldata.c
