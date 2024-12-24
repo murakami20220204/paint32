@@ -1,0 +1,164 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 (日本) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAIN MENU
+BEGIN
+    POPUP "ファイル(&F)"
+    BEGIN
+        MENUITEM "開く(&O)...\tCtrl+O",           IDM_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "閉じる(&C)\tCtrl+F4",            IDM_CLOSE
+        MENUITEM "終了(&X)\tAlt+F4",              IDM_EXIT
+    END
+    MENUITEM "編集(&E)",                      0
+    MENUITEM "表示(&V)",                      0
+    MENUITEM "ツール(&T)",                     0
+    POPUP "ウィンドウ(&W)"
+    BEGIN
+        MENUITEM "重ねて表示(&C)",                   IDM_CASCADE
+        MENUITEM "水平に並べて表示(&H)",                IDM_TILEHORZ
+        MENUITEM "垂直に並べて表示(&V)",                IDM_TILEVERT
+        MENUITEM "アイコンを整列(&I)",                 IDM_ICONARRANGE
+        MENUITEM SEPARATOR
+        MENUITEM "すべて閉じる(&L)",                  IDM_CLOSEALL
+    END
+    POPUP "ヘルプ(&H)"
+    BEGIN
+        MENUITEM "バージョン情報(&A)",                 IDM_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAIN ACCELERATORS
+BEGIN
+    "O",            IDM_OPEN,               VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041104b0"
+        BEGIN
+            VALUE "CompanyName", "Taichi Murakami"
+            VALUE "FileDescription", "お絵かきソフト"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "Paint32.exe"
+            VALUE "LegalCopyright", "Copyright © 2024 Taichi Murakami. All rights reserved."
+            VALUE "OriginalFilename", "Paint32.exe"
+            VALUE "ProductName", "お絵かきソフト"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_PAINT               ICON                    "Paint32.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_APPTITLE            "お絵かきソフト"
+END
+
+#endif    // 日本語 (日本) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
