@@ -6,6 +6,8 @@ Copyright 2024 Taichi Murakami.
 #pragma once
 /* Windows */
 #include <windows.h>
+#include <pathcch.h>
+#include <strsafe.h>
 #include <tchar.h>
 /* C */
 #include <assert.h>

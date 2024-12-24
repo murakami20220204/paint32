@@ -34,6 +34,13 @@ LRESULT WINAPI DefProc(
 	_In_ LPARAM lParam);
 
 static
+LRESULT WINAPI OnAbout(
+	_In_ HWND hWnd,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam);
+
+static
 LRESULT WINAPI OnCommand(
 	_In_ HWND hWnd,
 	_In_ UINT uMsg,
@@ -68,12 +75,6 @@ LRESULT WINAPI OnSize(
 	_In_ WPARAM wParam,
 	_In_ LPARAM lParam);
 
-static
-BOOL WINAPI SetWindowPosOnSize(
-	_In_ HWND hWnd,
-	_In_opt_ HWND hWndInsertAfter,
-	_In_ const RECT *lpRect);
-
 EXTERN_C
 LRESULT CALLBACK FrameWindowProc(
 	_In_ HWND hWnd,
@@ -99,6 +100,9 @@ LRESULT CALLBACK FrameWindowProc(
 		break;
 	case WM_SIZE:
 		lpProc = OnSize;
+		break;
+	case FRAME_ABOUT:
+		lpProc = OnAbout;
 		break;
 	default:
 		lpProc = DefProc;
@@ -139,6 +143,18 @@ LRESULT WINAPI DefProc(
 }
 
 static
+LRESULT WINAPI OnAbout(
+	_In_ HWND hWnd,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam)
+{
+	HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE);
+	DialogBox(hInstance, MAKEINTRESOURCE(IDD_ABOUT), hWnd, AboutDialogProc);
+	return 0;
+}
+
+static
 LRESULT WINAPI OnCommand(
 	_In_ HWND hWnd,
 	_In_ UINT uMsg,
@@ -149,6 +165,12 @@ LRESULT WINAPI OnCommand(
 
 	switch (LOWORD(wParam))
 	{
+	case IDM_ABOUT:
+		lpProc = SendMessage;
+		uMsg = FRAME_ABOUT;
+		wParam = 0;
+		lParam = 0;
+		break;
 	case IDM_EXIT:
 		lpProc = SendMessage;
 		uMsg = WM_CLOSE;
@@ -225,17 +247,4 @@ LRESULT WINAPI OnSize(
 	}
 
 	return 0;
-}
-
-static
-BOOL WINAPI SetWindowPosOnSize(
-	_In_ HWND hWnd,
-	_In_opt_ HWND hWndInsertAfter,
-	_In_ const RECT *lpRect)
-{
-	const int X = lpRect->left;
-	const int Y = lpRect->top;
-	const int nWidth = lpRect->right - X;
-	const int nHeight = lpRect->bottom - Y;
-	return SetWindowPos(hWnd, hWndInsertAfter, X, Y, nWidth, nHeight, SWP_SHOWWINDOW);
 }

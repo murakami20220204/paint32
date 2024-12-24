@@ -53,3 +53,13 @@ LRESULT CALLBACK FrameWindowProc(
 	_In_ UINT uMsg,
 	_In_ WPARAM wParam,
 	_In_ LPARAM lParam);
+
+EXTERN_C
+BOOL WINAPI SetWindowPosOnCenter(
+	_In_ HWND hWnd);
+
+EXTERN_C
+BOOL WINAPI SetWindowPosOnSize(
+	_In_ HWND hWnd,
+	_In_opt_ HWND hWndInsertAfter,
+	_In_ const RECT *lpRect);
