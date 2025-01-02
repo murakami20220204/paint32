@@ -116,6 +116,13 @@ LRESULT WINAPI OnParentNotify(
 	_In_ LPARAM lParam);
 
 static
+LRESULT WINAPI OnPreferences(
+	_In_ HWND hWnd,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam);
+
+static
 LRESULT WINAPI OnSize(
 	_In_ HWND hWnd,
 	_In_ UINT uMsg,
@@ -162,6 +169,9 @@ LRESULT CALLBACK FrameWindowProc(
 		break;
 	case FRAME_PALETTE:
 		lpProc = OnPalette;
+		break;
+	case FRAME_PREFERENCES:
+		lpProc = OnPreferences;
 		break;
 	default:
 		lpProc = DefProc;
@@ -307,6 +317,12 @@ LRESULT WINAPI OnCommand(
 		wParam = 0;
 		lParam = 0;
 		break;
+	case IDM_PREFERENCES:
+		lpProc = SendMessage;
+		uMsg = FRAME_PREFERENCES;
+		wParam = 0;
+		lParam = 0;
+		break;
 	default:
 		lpProc = DefProc;
 		break;
@@ -444,6 +460,41 @@ LRESULT WINAPI OnParentNotify(
 	}
 
 	return nResult ? 0 : DefProc(hWnd, uMsg, wParam, lParam);
+}
+
+static
+LRESULT WINAPI OnPreferences(
+	_In_ HWND hWnd,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam)
+{
+	HPROPSHEETPAGE phpage[2];
+	PROPSHEETHEADER psh;
+	PROPSHEETPAGE psp;
+	TCHAR strCaption[LOADSTRING_MAX];
+	ZeroMemory(phpage, sizeof phpage);
+	ZeroMemory(&psh, sizeof psh);
+	ZeroMemory(&psp, sizeof psp);
+	psh.dwSize = sizeof psh;
+	psh.dwFlags = PSH_NOAPPLYNOW | PSH_NOCONTEXTHELP;
+	psh.hwndParent = hWnd;
+	psh.hInstance = (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE);
+	psh.hIcon = (HICON)GetClassLongPtr(hWnd, GCLP_HICON);
+	psh.pszCaption = strCaption;
+	psh.nPages = ARRAYSIZE(phpage);
+	psh.phpage = phpage;
+	psp.dwSize = sizeof psp;
+	psp.hInstance = psh.hInstance;
+	psp.pszTemplate = MAKEINTRESOURCE(IDD_AUTOSAVE);
+	psp.pfnDlgProc = AutosaveDialogProc;
+	phpage[0] = CreatePropertySheetPage(&psp);
+	psp.pszTemplate = MAKEINTRESOURCE(IDD_STARTUP);
+	psp.pfnDlgProc = StartupDialogProc;
+	phpage[1] = CreatePropertySheetPage(&psp);
+	LoadString(psh.hInstance, IDS_PREFERENCES, strCaption, LOADSTRING_MAX);
+	PropertySheet(&psh);
+	return 0;
 }
 
 static

@@ -34,6 +34,7 @@ enum FRAME_WINDOW_MESSAGE
 	FRAME_OPEN,
 	FRAME_OUTLINE,
 	FRAME_PALETTE,
+	FRAME_PREFERENCES,
 };
 
 typedef struct tagPALETTECREATESTRUCT
@@ -58,6 +59,13 @@ INT_PTR CALLBACK AboutDialogProc(
 	_In_ LPARAM lParam);
 
 EXTERN_C
+INT_PTR CALLBACK AutosaveDialogProc(
+	_In_ HWND hDlg,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam);
+
+EXTERN_C
 INT_PTR CALLBACK ColorDialogProc(
 	_In_ HWND hDlg,
 	_In_ UINT uMsg,
@@ -73,6 +81,13 @@ INT_PTR CALLBACK DialDialogProc(
 
 EXTERN_C
 INT_PTR CALLBACK NewDialogProc(
+	_In_ HWND hDlg,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam);
+
+EXTERN_C
+INT_PTR CALLBACK StartupDialogProc(
 	_In_ HWND hDlg,
 	_In_ UINT uMsg,
 	_In_ WPARAM wParam,
