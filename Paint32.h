@@ -8,7 +8,7 @@ Copyright 2025 Taichi Murakami.
 #define DOCUMENTCLASSNAME       TEXT("Document")
 #define FRAMECLASSNAME          TEXT("Frame")
 #define MDICLIENTCLASSNAME      TEXT("MDIClient")
-#define OUTLINECLASSNAME       TEXT("Outline")
+#define OUTLINECLASSNAME        TEXT("Outline")
 #define WM_USERAPP 0x1000
 
 #ifdef _WIN64
@@ -31,8 +31,34 @@ enum FRAME_WINDOW_MESSAGE
 	FRAME_OUTLINE,
 };
 
+typedef struct tagPALETTECREATESTRUCT
+{
+	WORD wIDColor;
+	WORD wIDHistory;
+	WORD wIDFavorites;
+} PALETTECREATESTRUCT, FAR *LPPALETTECREATESTRUCT;
+
+typedef struct tagOUTLINECREATESTRUCT
+{
+	WORD wID;
+} OUTLINECREATESTRUCT, FAR *LPOUTLINECREATESTRUCT;
+
 EXTERN_C
 INT_PTR CALLBACK AboutDialogProc(
+	_In_ HWND hDlg,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam);
+
+EXTERN_C
+INT_PTR CALLBACK ColorDialogProc(
+	_In_ HWND hDlg,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam);
+
+EXTERN_C
+INT_PTR CALLBACK DialDialogProc(
 	_In_ HWND hDlg,
 	_In_ UINT uMsg,
 	_In_ WPARAM wParam,

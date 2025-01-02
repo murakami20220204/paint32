@@ -146,7 +146,7 @@ LRESULT WINAPI OnCreate(
 	HINSTANCE hInstance;
 	LRESULT nResult = -1;
 	hInstance = ((LPCREATESTRUCT)lParam)->hInstance;
-	SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)((LPCREATESTRUCT)lParam)->lpCreateParams);
+	SetWindowLongPtr(hWnd, GWLP_USERDATA, ((LPOUTLINECREATESTRUCT)((LPCREATESTRUCT)lParam)->lpCreateParams)->wID);
 
 	if (CreateTreeView(hWnd, hInstance))
 	{

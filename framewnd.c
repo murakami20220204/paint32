@@ -167,13 +167,15 @@ HWND WINAPI CreateOutlineWindow(
 	_In_opt_ HINSTANCE hInstance)
 {
 	HWND hWndOutline;
+	OUTLINECREATESTRUCT param;
 	TCHAR strCaption[LOADSTRING_MAX];
 	hWndOutline = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDOUTLINE);
 
 	if (!hWndOutline)
 	{
+		param.wID = ID_HWNDOUTLINE;
 		LoadString(hInstance, IDS_LAYER, strCaption, LOADSTRING_MAX);
-		hWndOutline = CreateWindow(OUTLINECLASSNAME, strCaption, WS_HWNDOUTLINE, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, hWnd, NULL, hInstance, (LPVOID)ID_HWNDOUTLINE);
+		hWndOutline = CreateWindow(OUTLINECLASSNAME, strCaption, WS_HWNDOUTLINE, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, hWnd, NULL, hInstance, &param);
 
 		if (hWndOutline)
 		{
