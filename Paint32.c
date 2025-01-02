@@ -164,13 +164,20 @@ BOOL WINAPI RegisterPrivateClasses(
 	wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_PAINT));
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	atom = RegisterClassEx(&wc);
-	if (!atom) goto EXIT;
 
+	if (!atom) goto EXIT;
 	wc.lpfnWndProc = OutlineWindowProc;
 	wc.cbWndExtra = OUTLINEWINDOWEXTRA;
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = OUTLINECLASSNAME;
 	atom = RegisterClassEx(&wc);
+
+	if (!atom) goto EXIT;
+	wc.lpfnWndProc = PaletteWindowProc;
+	wc.cbWndExtra = PALETTEWINDOWEXTRA;
+	wc.lpszClassName = PALETTECLASSNAME;
+	atom = RegisterClassEx(&wc);
+
 EXIT:
 	return !!atom;
 }

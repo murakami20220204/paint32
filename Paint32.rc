@@ -65,6 +65,7 @@ BEGIN
     POPUP "表示(&V)"
     BEGIN
         MENUITEM "レイヤー ウィンドウ(&L)",              IDM_LAYER
+        MENUITEM "パレット ウィンドウ(&P)",              IDM_PALETTE
     END
     POPUP "ツール(&T)"
     BEGIN
@@ -160,6 +161,14 @@ BEGIN
     LTEXT           "お絵かきソフト\r\nCopyright © 2024 Taichi Murakami. All rights reserved.",IDC_CONTENT,7,7,187,50
 END
 
+IDD_COLOR DIALOGEX 0, 0, 195, 127
+STYLE DS_SETFONT | WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "色"
+FONT 9, "MS UI Gothic", 400, 0, 0x0
+BEGIN
+    LTEXT           "TODO: プロパティ ページをレイアウトしてください。",IDC_STATIC,27,54,159,8
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -176,6 +185,10 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 80
     END
+
+    IDD_COLOR, DIALOG
+    BEGIN
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -186,6 +199,11 @@ END
 //
 
 IDD_ABOUT AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_COLOR AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

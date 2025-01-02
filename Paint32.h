@@ -9,16 +9,19 @@ Copyright 2025 Taichi Murakami.
 #define FRAMECLASSNAME          TEXT("Frame")
 #define MDICLIENTCLASSNAME      TEXT("MDIClient")
 #define OUTLINECLASSNAME        TEXT("Outline")
+#define PALETTECLASSNAME        TEXT("Palette")
 #define WM_USERAPP 0x1000
 
 #ifdef _WIN64
 #define DOCUMENTWINDOWEXTRA     0
-#define FRAMEWINDOWEXTRA        16
+#define FRAMEWINDOWEXTRA        24
 #define OUTLINEWINDOWEXTRA      8
+#define PALETTEWINDOWEXTRA      16
 #else
 #define DOCUMENTWINDOWEXTRA     0
-#define FRAMEWINDOWEXTRA        8
+#define FRAMEWINDOWEXTRA        12
 #define OUTLINEWINDOWEXTRA      4
+#define PALETTEWINDOWEXTRA      12
 #endif
 
 enum FRAME_WINDOW_MESSAGE
@@ -29,10 +32,13 @@ enum FRAME_WINDOW_MESSAGE
 	FRAME_GETMDICLIENT,
 	FRAME_OPEN,
 	FRAME_OUTLINE,
+	FRAME_PALETTE,
 };
 
 typedef struct tagPALETTECREATESTRUCT
 {
+	WORD wLayout;
+	WORD wID;
 	WORD wIDColor;
 	WORD wIDHistory;
 	WORD wIDFavorites;
@@ -73,6 +79,13 @@ LRESULT CALLBACK DocumentWindowProc(
 
 EXTERN_C
 LRESULT CALLBACK OutlineWindowProc(
+	_In_ HWND hWnd,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam);
+
+EXTERN_C
+LRESULT CALLBACK PaletteWindowProc(
 	_In_ HWND hWnd,
 	_In_ UINT uMsg,
 	_In_ WPARAM wParam,

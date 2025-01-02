@@ -6,25 +6,29 @@ Application ウィンドウ プロシージャを実装します。
 #include "stdafx.h"
 #include "paint32.h"
 #include "resource.h"
-#define ID_FIRSTCHILD 1
-#define ID_HWNDCLIENT 1
-#define ID_HWNDOUTLINE 2
-#define ID_WINDOWMENU 4
-#define LOADSTRING_MAX 32
-#define MINTRACKSIZE_X 300
-#define MINTRACKSIZE_Y 200
-#define WS_HWNDCLIENT (WS_CHILD | WS_CLIPCHILDREN | WS_VSCROLL | WS_HSCROLL)
-#define WS_HWNDOUTLINE (WS_CAPTION | WS_SYSMENU | WS_THICKFRAME)
+#define ID_FIRSTCHILD   1
+#define ID_HWNDCLIENT   1
+#define ID_HWNDOUTLINE  2
+#define ID_HWNDPALETTE  3
+#define ID_WINDOWMENU   4
+#define LOADSTRING_MAX  32
+#define MINTRACKSIZE_X  300
+#define MINTRACKSIZE_Y  200
+#define WS_HWNDCLIENT   (WS_CHILD | WS_CLIPCHILDREN | WS_VSCROLL | WS_HSCROLL)
+#define WS_HWNDOUTLINE  (WS_CAPTION | WS_SYSMENU | WS_THICKFRAME)
+#define WS_HWNDPALETTE  (WS_CAPTION | WS_SYSMENU | WS_THICKFRAME)
 
 typedef struct tagFRAMEWINDOWEXTRA
 {
 	LONG_PTR hWndClient;
 	LONG_PTR hWndOutline;
+	LONG_PTR hWndPalette;
 } WINDOWEXTRA;
 
 static_assert(sizeof(WINDOWEXTRA) == FRAMEWINDOWEXTRA, "FRAMEWINDOWEXTRA");
 #define GWLP_HWNDCLIENT         offsetof(WINDOWEXTRA, hWndClient)
 #define GWLP_HWNDOUTLINE        offsetof(WINDOWEXTRA, hWndOutline)
+#define GWLP_HWNDPALETTE        offsetof(WINDOWEXTRA, hWndPalette)
 
 static
 HWND WINAPI CreateClientWindow(
@@ -33,6 +37,11 @@ HWND WINAPI CreateClientWindow(
 
 static
 HWND WINAPI CreateOutlineWindow(
+	_In_ HWND hWnd,
+	_In_opt_ HINSTANCE hInstance);
+
+static
+HWND WINAPI CreatePaletteWindow(
 	_In_ HWND hWnd,
 	_In_opt_ HINSTANCE hInstance);
 
@@ -86,6 +95,13 @@ LRESULT WINAPI OnOutline(
 	_In_ LPARAM lParam);
 
 static
+LRESULT WINAPI OnPalette(
+	_In_ HWND hWnd,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam);
+
+static
 LRESULT WINAPI OnParentNotify(
 	_In_ HWND hWnd,
 	_In_ UINT uMsg,
@@ -133,6 +149,9 @@ LRESULT CALLBACK FrameWindowProc(
 		break;
 	case FRAME_OUTLINE:
 		lpProc = OnOutline;
+		break;
+	case FRAME_PALETTE:
+		lpProc = OnPalette;
 		break;
 	default:
 		lpProc = DefProc;
@@ -188,6 +207,33 @@ HWND WINAPI CreateOutlineWindow(
 }
 
 static
+HWND WINAPI CreatePaletteWindow(
+	_In_ HWND hWnd,
+	_In_opt_ HINSTANCE hInstance)
+{
+	HWND hWndPalette;
+	PALETTECREATESTRUCT param;
+	TCHAR strCaption[LOADSTRING_MAX];
+	hWndPalette = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDPALETTE);
+
+	if (!hWndPalette)
+	{
+		ZeroMemory(&param, sizeof param);
+		param.wID = ID_HWNDPALETTE;
+		LoadString(hInstance, IDS_PALETTE, strCaption, LOADSTRING_MAX);
+		hWndPalette = CreateWindow(PALETTECLASSNAME, strCaption, WS_HWNDPALETTE, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, hWnd, NULL, hInstance, &param);
+
+		if (hWndPalette)
+		{
+			SetWindowLongPtr(hWnd, GWLP_HWNDPALETTE, (LONG_PTR)hWndPalette);
+			ShowWindow(hWndPalette, SW_SHOW);
+		}
+	}
+
+	return hWndPalette;
+}
+
+static
 LRESULT WINAPI DefProc(
 	_In_ HWND hWnd,
 	_In_ UINT uMsg,
@@ -236,6 +282,12 @@ LRESULT WINAPI OnCommand(
 	case IDM_LAYER:
 		lpProc = SendMessage;
 		uMsg = FRAME_OUTLINE;
+		wParam = 0;
+		lParam = 0;
+		break;
+	case IDM_PALETTE:
+		lpProc = SendMessage;
+		uMsg = FRAME_PALETTE;
 		wParam = 0;
 		lParam = 0;
 		break;
@@ -293,28 +345,6 @@ LRESULT WINAPI OnGetMinMaxInfo(
 }
 
 static
-LRESULT WINAPI OnParentNotify(
-	_In_ HWND hWnd,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam)
-{
-	LRESULT nResult = 0;
-
-	switch (LOWORD(wParam))
-	{
-	case ID_HWNDOUTLINE:
-		SetWindowLongPtr(hWnd, GWLP_HWNDOUTLINE, 0);
-		break;
-	default:
-		nResult = DefProc(hWnd, uMsg, wParam, lParam);
-		break;
-	}
-
-	return nResult;
-}
-
-static
 LRESULT WINAPI OnOutline(
 	_In_ HWND hWnd,
 	_In_ UINT uMsg,
@@ -334,6 +364,58 @@ LRESULT WINAPI OnOutline(
 	}
 
 	return (LRESULT)hWndOutline;
+}
+
+static
+LRESULT WINAPI OnPalette(
+	_In_ HWND hWnd,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam)
+{
+	HWND hWndPalette;
+	hWndPalette = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDPALETTE);
+
+	if (hWndPalette)
+	{
+		SendMessage(hWndPalette, WM_CLOSE, 0, 0);
+	}
+	else
+	{
+		hWndPalette = CreatePaletteWindow(hWnd, (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE));
+	}
+
+	return (LRESULT)hWndPalette;
+}
+
+static
+LRESULT WINAPI OnParentNotify(
+	_In_ HWND hWnd,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam)
+{
+	LRESULT nResult = FALSE;
+
+	switch (LOWORD(wParam))
+	{
+	case WM_DESTROY:
+		switch (HIWORD(wParam))
+		{
+		case ID_HWNDOUTLINE:
+			SetWindowLongPtr(hWnd, GWLP_HWNDOUTLINE, 0);
+			nResult = TRUE;
+			break;
+		case ID_HWNDPALETTE:
+			SetWindowLongPtr(hWnd, GWLP_HWNDPALETTE, 0);
+			nResult = TRUE;
+			break;
+		}
+
+		break;
+	}
+
+	return nResult ? 0 : DefProc(hWnd, uMsg, wParam, lParam);
 }
 
 static
