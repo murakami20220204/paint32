@@ -58,9 +58,18 @@ BEGIN
         MENUITEM "閉じる(&C)\tCtrl+F4",            IDM_CLOSE
         MENUITEM "終了(&X)\tAlt+F4",              IDM_EXIT
     END
-    MENUITEM "編集(&E)",                      0
-    MENUITEM "表示(&V)",                      0
-    MENUITEM "ツール(&T)",                     0
+    POPUP "編集(&E)"
+    BEGIN
+        MENUITEM "元に戻す(&U)\tCtrl+Z",            IDM_UNDO
+    END
+    POPUP "表示(&V)"
+    BEGIN
+        MENUITEM "レイヤー ウィンドウ(&L)",              IDM_LAYER
+    END
+    POPUP "ツール(&T)"
+    BEGIN
+        MENUITEM "ペン(&P)",                      IDM_PEN
+    END
     POPUP "ウィンドウ(&W)"
     BEGIN
         MENUITEM "重ねて表示(&C)",                   IDM_CASCADE
@@ -114,7 +123,7 @@ BEGIN
             VALUE "FileDescription", "お絵かきソフト"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "Paint32.exe"
-            VALUE "LegalCopyright", "Copyright © 2024 Taichi Murakami. All rights reserved."
+            VALUE "LegalCopyright", "Copyright © 2025 Taichi Murakami. All rights reserved."
             VALUE "OriginalFilename", "Paint32.exe"
             VALUE "ProductName", "お絵かきソフト"
             VALUE "ProductVersion", "1.0.0.1"
@@ -190,6 +199,13 @@ END
 STRINGTABLE
 BEGIN
     IDS_APPTITLE            "お絵かきソフト"
+    IDS_UNTITLED            "(無題)"
+    IDS_LAYER               "レイヤー"
+    IDS_COLOR               "色"
+    IDS_PALETTE             "パレット"
+    IDS_HISTORY             "履歴"
+    IDS_FAVORITES           "お気に入り"
+    IDS_PREFERENCES         "環境設定"
 END
 
 #endif    // 日本語 (日本) resources

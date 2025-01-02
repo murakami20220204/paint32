@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2024 Taichi Murakami.
+Copyright 2025 Taichi Murakami.
 アプリケーションのメイン エントリ ポイントを実装します。
 */
 
@@ -8,6 +8,9 @@ Copyright 2024 Taichi Murakami.
 #include "resource.h"
 #define ERRORMESSAGEBOXFLAGS (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM)
 #define LOADSTRING_MAX 32
+
+static const
+INITCOMMONCONTROLSEX ICCEX = { sizeof(INITCOMMONCONTROLSEX), ICC_TREEVIEW_CLASSES };
 
 static
 HWND WINAPI CreateFrameWindow(
@@ -34,6 +37,7 @@ int APIENTRY _tWinMain(
 	if (SUCCEEDED(hResult))
 	{
 		if (RegisterPrivateClasses(hInstance) &&
+			InitCommonControlsEx(&ICCEX) &&
 			(hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_MAIN))) &&
 			(hWndFrame = CreateFrameWindow(hInstance)))
 		{
@@ -156,7 +160,17 @@ BOOL WINAPI RegisterPrivateClasses(
 		FRAMECLASSNAME,
 	};
 
+	UINT atom;
 	wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_PAINT));
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	return !!RegisterClassEx(&wc);
+	atom = RegisterClassEx(&wc);
+	if (!atom) goto EXIT;
+
+	wc.lpfnWndProc = OutlineWindowProc;
+	wc.cbWndExtra = OUTLINEWINDOWEXTRA;
+	wc.lpszMenuName = NULL;
+	wc.lpszClassName = OUTLINECLASSNAME;
+	atom = RegisterClassEx(&wc);
+EXIT:
+	return !!atom;
 }

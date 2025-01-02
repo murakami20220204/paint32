@@ -1,5 +1,5 @@
 ﻿/*
-Copyright 2024 Taichi Murakami.
+Copyright 2025 Taichi Murakami.
 Application ウィンドウ プロシージャを実装します。
 */
 
@@ -8,21 +8,31 @@ Application ウィンドウ プロシージャを実装します。
 #include "resource.h"
 #define ID_FIRSTCHILD 1
 #define ID_HWNDCLIENT 1
+#define ID_HWNDOUTLINE 2
 #define ID_WINDOWMENU 4
+#define LOADSTRING_MAX 32
 #define MINTRACKSIZE_X 300
 #define MINTRACKSIZE_Y 200
 #define WS_HWNDCLIENT (WS_CHILD | WS_CLIPCHILDREN | WS_VSCROLL | WS_HSCROLL)
+#define WS_HWNDOUTLINE (WS_CAPTION | WS_SYSMENU | WS_THICKFRAME)
 
 typedef struct tagFRAMEWINDOWEXTRA
 {
 	LONG_PTR hWndClient;
+	LONG_PTR hWndOutline;
 } WINDOWEXTRA;
 
 static_assert(sizeof(WINDOWEXTRA) == FRAMEWINDOWEXTRA, "FRAMEWINDOWEXTRA");
-#define GWLP_HWNDCLIENT offsetof(WINDOWEXTRA, hWndClient)
+#define GWLP_HWNDCLIENT         offsetof(WINDOWEXTRA, hWndClient)
+#define GWLP_HWNDOUTLINE        offsetof(WINDOWEXTRA, hWndOutline)
 
 static
 HWND WINAPI CreateClientWindow(
+	_In_ HWND hWnd,
+	_In_opt_ HINSTANCE hInstance);
+
+static
+HWND WINAPI CreateOutlineWindow(
 	_In_ HWND hWnd,
 	_In_opt_ HINSTANCE hInstance);
 
@@ -69,6 +79,20 @@ LRESULT WINAPI OnGetMinMaxInfo(
 	_In_ LPARAM lParam);
 
 static
+LRESULT WINAPI OnOutline(
+	_In_ HWND hWnd,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam);
+
+static
+LRESULT WINAPI OnParentNotify(
+	_In_ HWND hWnd,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam);
+
+static
 LRESULT WINAPI OnSize(
 	_In_ HWND hWnd,
 	_In_ UINT uMsg,
@@ -98,11 +122,17 @@ LRESULT CALLBACK FrameWindowProc(
 	case WM_GETMINMAXINFO:
 		lpProc = OnGetMinMaxInfo;
 		break;
+	case WM_PARENTNOTIFY:
+		lpProc = OnParentNotify;
+		break;
 	case WM_SIZE:
 		lpProc = OnSize;
 		break;
 	case FRAME_ABOUT:
 		lpProc = OnAbout;
+		break;
+	case FRAME_OUTLINE:
+		lpProc = OnOutline;
 		break;
 	default:
 		lpProc = DefProc;
@@ -129,6 +159,30 @@ HWND WINAPI CreateClientWindow(
 	}
 
 	return hWndClient;
+}
+
+static
+HWND WINAPI CreateOutlineWindow(
+	_In_ HWND hWnd,
+	_In_opt_ HINSTANCE hInstance)
+{
+	HWND hWndOutline;
+	TCHAR strCaption[LOADSTRING_MAX];
+	hWndOutline = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDOUTLINE);
+
+	if (!hWndOutline)
+	{
+		LoadString(hInstance, IDS_LAYER, strCaption, LOADSTRING_MAX);
+		hWndOutline = CreateWindow(OUTLINECLASSNAME, strCaption, WS_HWNDOUTLINE, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, hWnd, NULL, hInstance, (LPVOID)ID_HWNDOUTLINE);
+
+		if (hWndOutline)
+		{
+			SetWindowLongPtr(hWnd, GWLP_HWNDOUTLINE, (LONG_PTR)hWndOutline);
+			ShowWindow(hWndOutline, SW_SHOW);
+		}
+	}
+
+	return hWndOutline;
 }
 
 static
@@ -174,6 +228,12 @@ LRESULT WINAPI OnCommand(
 	case IDM_EXIT:
 		lpProc = SendMessage;
 		uMsg = WM_CLOSE;
+		wParam = 0;
+		lParam = 0;
+		break;
+	case IDM_LAYER:
+		lpProc = SendMessage;
+		uMsg = FRAME_OUTLINE;
 		wParam = 0;
 		lParam = 0;
 		break;
@@ -228,6 +288,50 @@ LRESULT WINAPI OnGetMinMaxInfo(
 	const POINT ptSize = { MINTRACKSIZE_X, MINTRACKSIZE_Y };
 	CopyMemory(&((LPMINMAXINFO)lParam)->ptMinTrackSize, &ptSize, sizeof ptSize);
 	return DefProc(hWnd, uMsg, wParam, lParam);
+}
+
+static
+LRESULT WINAPI OnParentNotify(
+	_In_ HWND hWnd,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam)
+{
+	LRESULT nResult = 0;
+
+	switch (LOWORD(wParam))
+	{
+	case ID_HWNDOUTLINE:
+		SetWindowLongPtr(hWnd, GWLP_HWNDOUTLINE, 0);
+		break;
+	default:
+		nResult = DefProc(hWnd, uMsg, wParam, lParam);
+		break;
+	}
+
+	return nResult;
+}
+
+static
+LRESULT WINAPI OnOutline(
+	_In_ HWND hWnd,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam)
+{
+	HWND hWndOutline;
+	hWndOutline = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDOUTLINE);
+
+	if (hWndOutline)
+	{
+		SendMessage(hWndOutline, WM_CLOSE, 0, 0);
+	}
+	else
+	{
+		hWndOutline = CreateOutlineWindow(hWnd, (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE));
+	}
+
+	return (LRESULT)hWndOutline;
 }
 
 static
