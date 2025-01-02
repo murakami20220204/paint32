@@ -24,9 +24,6 @@
     <ClCompile Include="framewnd.c">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="aboutdlg.c">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="outline.c">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -37,6 +34,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="new.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="about.c">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>

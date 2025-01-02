@@ -159,8 +159,10 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "バージョン情報"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
+    LTEXT           "お絵かきソフト\r\nCopyright © 2025 Taichi Murakami. All rights reserved.",IDC_STATIC,7,7,187,30
+    LTEXT           "バージョン:",IDC_STATIC,7,49,40,8
+    LTEXT           "0.0.0.0",IDC_VERSION,50,49,144,8
     DEFPUSHBUTTON   "閉じる",IDOK,144,65,50,15
-    LTEXT           "お絵かきソフト\r\nCopyright © 2024 Taichi Murakami. All rights reserved.",IDC_CONTENT,7,7,187,50
 END
 
 IDD_COLOR DIALOGEX 0, 0, 195, 127

@@ -1,21 +1,21 @@
 ﻿/*
-Copyright 2024 Taichi Murakami.
-About ダイアログ プロシージャを実装します。
+Copyright 2025 Taichi Murakami.
+バージョン情報ダイアログ プロシージャを実装します。
 */
 
 #include "stdafx.h"
 #include "paint32.h"
 #include "resource.h"
-#define FORMAT TEXT("%s\r\nVersion %s\r\n%s")
-#define SUBBLOCK(Text) (TEXT("\\StringFileInfo\\041104B0\\") TEXT(Text))
-#define SUBBLOCK_COPYRIGHT SUBBLOCK("LegalCopyright")
-#define SUBBLOCK_PRODUCTNAME SUBBLOCK("ProductName")
-#define SUBBLOCK_PRODUCTVERSION SUBBLOCK("ProductVersion")
+#define VERSIONINFO_FORMAT      TEXT("\\StringFileInfo\\%04X%04X\\ProductVersion")
+#define VERSIONINFO_TRANSLATION TEXT("\\VarFileInfo\\Translation")
 
 static
 BOOL WINAPI LoadVersion(
 	_In_ HWND hDlg);
 
+/*
+バージョン情報ダイアログ プロシージャ。
+*/
 EXTERN_C
 INT_PTR CALLBACK AboutDialogProc(
 	_In_ HWND hDlg,
@@ -45,16 +45,21 @@ INT_PTR CALLBACK AboutDialogProc(
 	return bResult;
 }
 
+/*
+現在のインスタンスに埋め込まれたリソースからバージョン情報を取得します。
+バージョン情報は子コントロールのテキストとして設定されます。
+*/
 static
 BOOL WINAPI LoadVersion(
 	_In_ HWND hDlg)
 {
 	HANDLE hHeap;
 	HINSTANCE hInstance;
-	LPTSTR lpCopyright, lpFileName, lpProductName, lpProductVersion;
+	LPWORD lpBlock;
+	LPTSTR lpFileName;
 	LPVOID lpVersionInfo;
 	DWORD cbVersionInfo;
-	UINT uLength;
+	UINT cbBlock;
 	BOOL bResult = FALSE;
 
 	if ((hInstance = (HINSTANCE)GetWindowLongPtr(hDlg, GWLP_HINSTANCE)) &&
@@ -66,12 +71,13 @@ BOOL WINAPI LoadVersion(
 			(lpVersionInfo = HeapAlloc(hHeap, 0, cbVersionInfo)))
 		{
 			if (GetFileVersionInfo(lpFileName, 0, cbVersionInfo, lpVersionInfo) &&
-				VerQueryValue(lpVersionInfo, SUBBLOCK_PRODUCTNAME, &lpProductName, &uLength) &&
-				VerQueryValue(lpVersionInfo, SUBBLOCK_PRODUCTVERSION, &lpProductVersion, &uLength) &&
-				VerQueryValue(lpVersionInfo, SUBBLOCK_COPYRIGHT, &lpCopyright, &uLength) &&
-				SUCCEEDED(StringCchPrintf(lpFileName, PATHCCH_MAX_CCH, FORMAT, lpProductName, lpProductVersion, lpCopyright)))
+				VerQueryValue(lpVersionInfo, VERSIONINFO_TRANSLATION, &lpBlock, &cbBlock) &&
+				(cbBlock >= sizeof(DWORD)) &&
+				SUCCEEDED(StringCchPrintf(lpFileName, PATHCCH_MAX_CCH, VERSIONINFO_FORMAT, lpBlock[0], lpBlock[1])) &&
+				VerQueryValue(lpVersionInfo, lpFileName, &lpBlock, &cbBlock) &&
+				cbBlock)
 			{
-				bResult = SetDlgItemText(hDlg, IDC_CONTENT, lpFileName);
+				bResult = SetDlgItemText(hDlg, IDC_VERSION, (LPCTSTR)lpBlock);
 			}
 
 			HeapFree(hHeap, 0, lpVersionInfo);
