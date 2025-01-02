@@ -53,6 +53,7 @@ IDR_MAIN MENU
 BEGIN
     POPUP "ファイル(&F)"
     BEGIN
+        MENUITEM "新規(&N)...\tCtrl+N",           IDM_NEW
         MENUITEM "開く(&O)...\tCtrl+O",           IDM_OPEN
         MENUITEM SEPARATOR
         MENUITEM "閉じる(&C)\tCtrl+F4",            IDM_CLOSE
@@ -95,6 +96,7 @@ END
 IDR_MAIN ACCELERATORS
 BEGIN
     "O",            IDM_OPEN,               VIRTKEY, CONTROL, NOINVERT
+    "N",            IDM_NEW,                VIRTKEY, CONTROL, NOINVERT
 END
 
 
@@ -169,6 +171,15 @@ BEGIN
     LTEXT           "TODO: プロパティ ページをレイアウトしてください。",IDC_STATIC,27,54,159,8
 END
 
+IDD_NEW DIALOGEX 0, 0, 309, 176
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "新規"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,198,155,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,252,155,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -189,6 +200,14 @@ BEGIN
     IDD_COLOR, DIALOG
     BEGIN
     END
+
+    IDD_NEW, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 302
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 169
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -204,6 +223,11 @@ BEGIN
 END
 
 IDD_COLOR AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_NEW AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

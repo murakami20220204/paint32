@@ -88,6 +88,13 @@ LRESULT WINAPI OnGetMinMaxInfo(
 	_In_ LPARAM lParam);
 
 static
+LRESULT WINAPI OnNew(
+	_In_ HWND hWnd,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam);
+
+static
 LRESULT WINAPI OnOutline(
 	_In_ HWND hWnd,
 	_In_ UINT uMsg,
@@ -146,6 +153,9 @@ LRESULT CALLBACK FrameWindowProc(
 		break;
 	case FRAME_ABOUT:
 		lpProc = OnAbout;
+		break;
+	case FRAME_NEW:
+		lpProc = OnNew;
 		break;
 	case FRAME_OUTLINE:
 		lpProc = OnOutline;
@@ -285,6 +295,12 @@ LRESULT WINAPI OnCommand(
 		wParam = 0;
 		lParam = 0;
 		break;
+	case IDM_NEW:
+		lpProc = SendMessage;
+		uMsg = FRAME_NEW;
+		wParam = 0;
+		lParam = 0;
+		break;
 	case IDM_PALETTE:
 		lpProc = SendMessage;
 		uMsg = FRAME_PALETTE;
@@ -342,6 +358,18 @@ LRESULT WINAPI OnGetMinMaxInfo(
 	const POINT ptSize = { MINTRACKSIZE_X, MINTRACKSIZE_Y };
 	CopyMemory(&((LPMINMAXINFO)lParam)->ptMinTrackSize, &ptSize, sizeof ptSize);
 	return DefProc(hWnd, uMsg, wParam, lParam);
+}
+
+static
+LRESULT WINAPI OnNew(
+	_In_ HWND hWnd,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam)
+{
+	HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE);
+	DialogBox(hInstance, MAKEINTRESOURCE(IDD_NEW), hWnd, NewDialogProc);
+	return 0;
 }
 
 static
