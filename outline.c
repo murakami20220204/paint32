@@ -6,54 +6,25 @@ Copyright 2025 Taichi Murakami.
 #include "stdafx.h"
 #include "Paint32.h"
 #include "resource.h"
-#define DefProc DefWindowProc
-#define ID_HWNDTREE 1
-#define WS_HWNDTREE (WS_CHILD | WS_BORDER)
 
 typedef struct tagWINDOWEXTRA
 {
-	LONG_PTR hWndTree;
+	LONG_PTR lpTreeView;
 } WINDOWEXTRA;
 
+#define DefProc         DefWindowProc
+#define GWLP_HWNDTREE   offsetof(WINDOWEXTRA, lpTreeView)
+#define ID_HWNDTREE     1
+#define WS_HWNDTREE     (WS_CHILD | WS_BORDER)
+
 static_assert(sizeof(WINDOWEXTRA) == OUTLINEWINDOWEXTRA, "OUTLINEWINDOWEXTRA");
-#define GWLP_HWNDTREE offsetof(WINDOWEXTRA, hWndTree)
-
 typedef LRESULT(CALLBACK FAR *DEFPROC)(HWND, UINT, WPARAM, LPARAM);
-
-static
-HWND WINAPI CreateTreeView(
-	_In_ HWND hWnd,
-	_In_opt_ HINSTANCE hInstance);
-
-static
-BOOL WINAPI LayoutTreeView(
-	_In_ HWND hWnd);
-
-static
-LRESULT WINAPI NotifyParent(
-	_In_ HWND hWnd,
-	_In_ UINT uMsg);
-
-static
-LRESULT WINAPI OnCreate(
-	_In_ HWND hWnd,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
-
-static
-LRESULT WINAPI OnDestroy(
-	_In_ HWND hWnd,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
-
-static
-LRESULT WINAPI OnSize(
-	_In_ HWND hWnd,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
+static HWND WINAPI CreateTreeView(_In_ HWND hWnd, _In_opt_ HINSTANCE hInstance);
+static BOOL WINAPI LayoutTreeView(_In_ HWND hWnd);
+static LRESULT WINAPI NotifyParent(_In_ HWND hWnd, _In_ UINT uMsg);
+static LRESULT WINAPI OnCreate(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+static LRESULT WINAPI OnDestroy(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+static LRESULT WINAPI OnSize(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
 
 EXTERN_C
 LRESULT CALLBACK OutlineWindowProc(

@@ -8,10 +8,7 @@ Copyright 2025 Taichi Murakami.
 #include "resource.h"
 #define VERSIONINFO_FORMAT      TEXT("\\StringFileInfo\\%04X%04X\\ProductVersion")
 #define VERSIONINFO_TRANSLATION TEXT("\\VarFileInfo\\Translation")
-
-static
-BOOL WINAPI LoadVersion(
-	_In_ HWND hDlg);
+static BOOL WINAPI LoadVersion(_In_ HWND hDlg);
 
 /*
 バージョン情報ダイアログ プロシージャ。

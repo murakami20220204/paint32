@@ -7,6 +7,7 @@ Copyright 2025 Taichi Murakami.
 #include "paint32.h"
 #include "resource.h"
 
+/* User Data */
 typedef struct tagUSERDATA
 {
 	COLORREF rgbHistoryColors[CUSTOMCOLORSLENGTH];
@@ -16,6 +17,7 @@ typedef struct tagUSERDATA
 	WORD wPaletteDock;
 } USERDATA, FAR *LPUSERDATA;
 
+/* Window Extra */
 typedef struct tagWINDOWEXTRA
 {
 	LONG_PTR lpClientWindow;
@@ -83,6 +85,9 @@ static LRESULT WINAPI OnToolbar(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wPar
 static BOOL WINAPI ResizeWindow(_In_ HWND hWnd, _In_ const RECT FAR *lpRect);
 static HWND WINAPI ToggleWindow(_In_ HWND hWnd, _In_ int nExtra, _In_ CREATECHILDPROC lpfnCreate);
 
+/*
+アプリケーション ウィンドウ プロシージャ。
+*/
 EXTERN_C
 LRESULT CALLBACK ApplicationWindowProc(
 	_In_ HWND hWnd,
@@ -150,6 +155,9 @@ LRESULT CALLBACK ApplicationWindowProc(
 	return lpProc(hWnd, uMsg, wParam, lParam);
 }
 
+/*
+指定した Window Extra 内のウィンドウ ハンドルを保持します。
+*/
 static
 BOOL WINAPI AppendChild(
 	_In_ HWND hWnd,
@@ -169,6 +177,9 @@ BOOL WINAPI AppendChild(
 	return !!lpUserData;
 }
 
+/*
+指定した Window Extra 内のウィンドウ ハンドルを削除します。
+*/
 static
 BOOL WINAPI ClearChild(
 	_In_ HWND hWnd,
@@ -187,6 +198,9 @@ BOOL WINAPI ClearChild(
 	return !!lpUserData;
 }
 
+/*
+新しい MDI クライアントを作成します。
+*/
 static
 HWND WINAPI CreateClientWindow(
 	_In_ HWND hWnd,
@@ -213,6 +227,9 @@ HWND WINAPI CreateClientWindow(
 	return hWndClient;
 }
 
+/*
+新しいアウトライン ウィンドウを作成します。
+*/
 static
 HWND WINAPI CreateOutlineWindow(
 	_In_ HWND hWnd,
@@ -240,6 +257,9 @@ HWND WINAPI CreateOutlineWindow(
 	return hWndOutline;
 }
 
+/*
+新しいパレット ウィンドウを作成します。
+*/
 static
 HWND WINAPI CreatePaletteWindow(
 	_In_ HWND hWnd,
@@ -261,6 +281,9 @@ HWND WINAPI CreatePaletteWindow(
 	return hWndPalette;
 }
 
+/*
+新しいステータス バーを作成します。
+*/
 static
 HWND WINAPI CreateStatusBar(
 	_In_ HWND hWnd,
@@ -282,6 +305,9 @@ HWND WINAPI CreateStatusBar(
 	return hWndStatus;
 }
 
+/*
+新しいツールバーを作成します。
+*/
 static
 HWND WINAPI CreateToolbar(
 	_In_ HWND hWnd,
@@ -303,6 +329,9 @@ HWND WINAPI CreateToolbar(
 	return hWndToolbar;
 }
 
+/*
+新しい User Data を作成します。
+*/
 static
 LPUSERDATA WINAPI CreateUserData(
 	_In_ HWND hWnd)
@@ -324,6 +353,9 @@ LPUSERDATA WINAPI CreateUserData(
 	return lpUserData;
 }
 
+/*
+MDI ウィンドウ プロシージャを呼び出します。
+*/
 static
 LRESULT WINAPI DefProc(
 	_In_ HWND hWnd,
@@ -334,6 +366,9 @@ LRESULT WINAPI DefProc(
 	return DefFrameProc(hWnd, (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDCLIENT), uMsg, wParam, lParam);
 }
 
+/*
+現在の User Data を破棄します。
+*/
 static
 BOOL WINAPI DestroyUserData(
 	_In_ HWND hWnd)
@@ -343,6 +378,9 @@ BOOL WINAPI DestroyUserData(
 	return lpUserData && HeapFree(GetProcessHeap(), 0, lpUserData);
 }
 
+/*
+指定したウィンドウの子ウィンドウを再配置します。
+*/
 static
 BOOL WINAPI LayoutControls(
 	_In_ HWND hWnd)
@@ -377,6 +415,9 @@ BOOL WINAPI LayoutControls(
 	return bResult;
 }
 
+/*
+バージョン情報ダイアログを表示します。
+*/
 static
 LRESULT WINAPI OnAbout(
 	_In_ HWND hWnd,
@@ -390,6 +431,9 @@ LRESULT WINAPI OnAbout(
 	return 0;
 }
 
+/*
+メニュー項目が選択された場合に呼び出されます。
+*/
 static
 LRESULT WINAPI OnCommand(
 	_In_ HWND hWnd,
@@ -433,6 +477,9 @@ LRESULT WINAPI OnCommand(
 	return nResult;
 }
 
+/*
+現在のウィンドウの子ウィンドウを作成します。
+*/
 static
 LRESULT WINAPI OnCreate(
 	_In_ HWND hWnd,
@@ -451,6 +498,9 @@ LRESULT WINAPI OnCreate(
 		DefProc(hWnd, uMsg, wParam, lParam) : -1;
 }
 
+/*
+現在のメッセージ ループを終了します。
+*/
 static
 LRESULT WINAPI OnDestroy(
 	_In_ HWND hWnd,
@@ -463,6 +513,9 @@ LRESULT WINAPI OnDestroy(
 	return DefProc(hWnd, uMsg, wParam, lParam);
 }
 
+/*
+DPI が変更された場合に呼び出されます。
+*/
 static
 LRESULT WINAPI OnDpiChanged(
 	_In_ HWND hWnd,
@@ -474,6 +527,9 @@ LRESULT WINAPI OnDpiChanged(
 	return DefProc(hWnd, uMsg, wParam, lParam);
 }
 
+/*
+ウィンドウの最小サイズを決定します。
+*/
 static
 LRESULT WINAPI OnGetMinMaxInfo(
 	_In_ HWND hWnd,
@@ -486,6 +542,9 @@ LRESULT WINAPI OnGetMinMaxInfo(
 	return DefProc(hWnd, uMsg, wParam, lParam);
 }
 
+/*
+メニュー上の表示した項目にチェックを付けます。
+*/
 static
 LRESULT WINAPI OnInitMenuPopup(
 	_In_ HWND hWnd,
@@ -532,6 +591,9 @@ LRESULT WINAPI OnInitMenuPopup(
 	return DefProc(hWnd, uMsg, wParam, lParam);
 }
 
+/*
+子ウィンドウのメッセージを処理します。
+*/
 static
 LRESULT WINAPI OnIsDialogMessage(
 	_In_ HWND hWnd,
@@ -564,6 +626,9 @@ EXIT:
 	return bResult;
 }
 
+/*
+新規ドキュメントを作成します。
+*/
 static
 LRESULT WINAPI OnNew(
 	_In_ HWND hWnd,
@@ -577,6 +642,9 @@ LRESULT WINAPI OnNew(
 	return 0;
 }
 
+/*
+アウトライン ウィンドウを表示または閉じます。
+*/
 static
 LRESULT WINAPI OnOutline(
 	_In_ HWND hWnd,
@@ -587,6 +655,9 @@ LRESULT WINAPI OnOutline(
 	return (LRESULT)ToggleWindow(hWnd, GWLP_HWNDOUTLINE, CreateOutlineWindow);
 }
 
+/*
+パレット ウィンドウを表示または閉じます。
+*/
 static
 LRESULT WINAPI OnPalette(
 	_In_ HWND hWnd,
@@ -597,6 +668,9 @@ LRESULT WINAPI OnPalette(
 	return (LRESULT)ToggleWindow(hWnd, GWLP_HWNDPALETTE, CreatePaletteWindow);
 }
 
+/*
+表示または閉じた子ウィンドウを保持します。
+*/
 static
 LRESULT WINAPI OnParentNotify(
 	_In_ HWND hWnd,
@@ -649,6 +723,9 @@ LRESULT WINAPI OnParentNotify(
 	return nResult ? 0 : DefProc(hWnd, uMsg, wParam, lParam);
 }
 
+/*
+環境設定ウィンドウを表示します。
+*/
 static
 LRESULT WINAPI OnPreferences(
 	_In_ HWND hWnd,
@@ -684,6 +761,9 @@ LRESULT WINAPI OnPreferences(
 	return 0;
 }
 
+/*
+ウィンドウ サイズが変更された場合に呼び出されます。
+*/
 static LRESULT WINAPI OnSize(
 	_In_ HWND hWnd,
 	_In_ UINT uMsg,
@@ -694,6 +774,9 @@ static LRESULT WINAPI OnSize(
 	return 0;
 }
 
+/*
+ステータス バーを表示または閉じます。
+*/
 static
 LRESULT WINAPI OnStatus(
 	_In_ HWND hWnd,
@@ -706,6 +789,9 @@ LRESULT WINAPI OnStatus(
 	return 0;
 }
 
+/*
+ツールバーを表示または閉じます。
+*/
 static
 LRESULT WINAPI OnToolbar(
 	_In_ HWND hWnd,
@@ -718,6 +804,9 @@ LRESULT WINAPI OnToolbar(
 	return 0;
 }
 
+/*
+DPI が変更された場合はウィンドウの大きさを更新します。
+*/
 static
 BOOL WINAPI ResizeWindow(
 	_In_ HWND hWnd,
@@ -730,6 +819,9 @@ BOOL WINAPI ResizeWindow(
 	return MoveWindow(hWnd, X, Y, nWidth, nHeight, TRUE);
 }
 
+/*
+指定したウィンドウを表示または閉じます。
+*/
 static
 HWND WINAPI ToggleWindow(
 	_In_ HWND hWnd,

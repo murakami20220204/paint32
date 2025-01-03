@@ -7,27 +7,9 @@ Copyright 2025 Taichi Murakami.
 #include "Paint32.h"
 
 typedef INT_PTR(WINAPI FAR *DEFPROC)(HWND, UINT, WPARAM, LPARAM);
-
-static
-INT_PTR WINAPI OnClose(
-	_In_ HWND hDlg,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
-
-static
-INT_PTR WINAPI OnCommand(
-	_In_ HWND hDlg,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
-
-static
-INT_PTR WINAPI OnInitDialog(
-	_In_ HWND hDlg,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
+static INT_PTR WINAPI OnClose(_In_ HWND hDlg, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+static INT_PTR WINAPI OnCommand(_In_ HWND hDlg, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+static INT_PTR WINAPI OnInitDialog(_In_ HWND hDlg, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
 
 EXTERN_C
 INT_PTR CALLBACK NewDialogProc(

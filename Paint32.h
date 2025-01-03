@@ -53,82 +53,20 @@ typedef struct tagOUTLINECREATESTRUCT
 	WORD wID;
 } OUTLINECREATESTRUCT, FAR *LPOUTLINECREATESTRUCT;
 
-EXTERN_C
-INT_PTR CALLBACK AboutDialogProc(
-	_In_ HWND hDlg,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
+/* External Functions */
+EXTERN_C int WINAPI ErrorMessageBox(_In_opt_ HINSTANCE hInstance, _In_opt_ HWND hWnd, _In_ DWORD dwError);
+EXTERN_C BOOL WINAPI SetWindowPosOnCenter(_In_ HWND hWnd);
 
-EXTERN_C
-INT_PTR CALLBACK AutosaveDialogProc(
-	_In_ HWND hDlg,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
+/* Window Procedures */
+EXTERN_C LRESULT CALLBACK ApplicationWindowProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+EXTERN_C LRESULT CALLBACK DocumentWindowProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+EXTERN_C LRESULT CALLBACK OutlineWindowProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+EXTERN_C LRESULT CALLBACK PaletteWindowProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
 
-EXTERN_C
-INT_PTR CALLBACK ColorDialogProc(
-	_In_ HWND hDlg,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
-
-EXTERN_C
-INT_PTR CALLBACK DialDialogProc(
-	_In_ HWND hDlg,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
-
-EXTERN_C
-INT_PTR CALLBACK NewDialogProc(
-	_In_ HWND hDlg,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
-
-EXTERN_C
-INT_PTR CALLBACK StartupDialogProc(
-	_In_ HWND hDlg,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
-
-EXTERN_C
-LRESULT CALLBACK ApplicationWindowProc(
-	_In_ HWND hWnd,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
-
-EXTERN_C
-LRESULT CALLBACK DocumentWindowProc(
-	_In_ HWND hWnd,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
-
-EXTERN_C
-LRESULT CALLBACK OutlineWindowProc(
-	_In_ HWND hWnd,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
-
-EXTERN_C
-LRESULT CALLBACK PaletteWindowProc(
-	_In_ HWND hWnd,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
-
-EXTERN_C
-int WINAPI ErrorMessageBox(
-	_In_opt_ HINSTANCE hInstance,
-	_In_opt_ HWND hWnd,
-	_In_ DWORD dwError);
-
-EXTERN_C
-BOOL WINAPI SetWindowPosOnCenter(
-	_In_ HWND hWnd);
+/* Dialog Procedures */
+EXTERN_C INT_PTR CALLBACK AboutDialogProc(_In_ HWND hDlg, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+EXTERN_C INT_PTR CALLBACK AutosaveDialogProc(_In_ HWND hDlg, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+EXTERN_C INT_PTR CALLBACK ColorDialogProc(_In_ HWND hDlg, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+EXTERN_C INT_PTR CALLBACK DialDialogProc(_In_ HWND hDlg, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+EXTERN_C INT_PTR CALLBACK NewDialogProc(_In_ HWND hDlg, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+EXTERN_C INT_PTR CALLBACK StartupDialogProc(_In_ HWND hDlg, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);

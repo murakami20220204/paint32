@@ -6,12 +6,6 @@ Copyright 2025 Taichi Murakami.
 #include "stdafx.h"
 #include "paint32.h"
 #include "resource.h"
-#define DefProc DefWindowProc
-#define ID_HWNDCOLOR    1
-#define LOADSTRING_MAX  32
-#define SWP_LAYOUT (SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW)
-
-typedef LRESULT(WINAPI FAR *DEFPROC)(HWND, UINT, WPARAM, LPARAM);
 
 typedef struct tagWINDOWEXTRA
 {
@@ -22,73 +16,28 @@ typedef struct tagWINDOWEXTRA
 	WORD wIDFavorites;
 } WINDOWEXTRA;
 
-static_assert(sizeof(WINDOWEXTRA) == PALETTEWINDOWEXTRA, "PALETTEWINDOWEXTRA");
+#define DefProc                 DefWindowProc
 #define GWLP_HWNDCOLOR          offsetof(WINDOWEXTRA, hWndColor)
 #define GWW_IDCOLOR             offsetof(WINDOWEXTRA, wIDColor)
 #define GWW_IDFAVORITES         offsetof(WINDOWEXTRA, wIDFavorites)
 #define GWW_IDHISTORY           offsetof(WINDOWEXTRA, wIDHistory)
 #define GWW_LAYOUT              offsetof(WINDOWEXTRA, wLayout)
+#define ID_HWNDCOLOR            1
+#define LOADSTRING_MAX          32
+#define SWP_LAYOUT              (SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW)
 
-static
-HWND WINAPI CreateColorDialog(
-	_In_ HWND hWnd,
-	_In_opt_ HINSTANCE hInstance);
-
-static
-BOOL WINAPI Layout(
-	_In_ HWND hWnd);
-
-static
-BOOL WINAPI LayoutControl(
-	_In_opt_ HWND hWnd,
-	_In_ UINT uLayout,
-	_Inout_ LPRECT lpClient);
-
-static
-LRESULT WINAPI OnCreate(
-	_In_ HWND hWnd,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
-
-static
-LRESULT WINAPI OnDestroy(
-	_In_ HWND hWnd,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
-
-static
-LRESULT WINAPI NotifyParent(
-	_In_ HWND hWnd,
-	_In_ UINT uMsg);
-
-static
-LRESULT WINAPI OnPaint(
-	_In_ HWND hWnd,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
-
-static
-LRESULT WINAPI OnParentNotify(
-	_In_ HWND hWnd,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
-
-static
-LRESULT WINAPI OnSize(
-	_In_ HWND hWnd,
-	_In_ UINT uMsg,
-	_In_ WPARAM wParam,
-	_In_ LPARAM lParam);
-
-static
-BOOL WINAPI PaintCaption(
-	_In_ HWND hWnd,
-	_In_ HDC hDC,
-	_In_ int nIndex);
+static_assert(sizeof(WINDOWEXTRA) == PALETTEWINDOWEXTRA, "PALETTEWINDOWEXTRA");
+typedef LRESULT(WINAPI FAR *DEFPROC)(HWND, UINT, WPARAM, LPARAM);
+static HWND WINAPI CreateColorDialog(_In_ HWND hWnd, _In_opt_ HINSTANCE hInstance);
+static BOOL WINAPI Layout(_In_ HWND hWnd);
+static BOOL WINAPI LayoutControl(_In_opt_ HWND hWnd, _In_ UINT uLayout, _Inout_ LPRECT lpClient);
+static LRESULT WINAPI OnCreate(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+static LRESULT WINAPI OnDestroy(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+static LRESULT WINAPI NotifyParent(_In_ HWND hWnd, _In_ UINT uMsg);
+static LRESULT WINAPI OnPaint(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+static LRESULT WINAPI OnParentNotify(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+static LRESULT WINAPI OnSize(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
+static BOOL WINAPI PaintCaption(_In_ HWND hWnd, _In_ HDC hDC, _In_ int nIndex);
 
 EXTERN_C
 LRESULT CALLBACK PaletteWindowProc(

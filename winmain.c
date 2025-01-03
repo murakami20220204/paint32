@@ -6,21 +6,15 @@ Copyright 2025 Taichi Murakami.
 #include "stdafx.h"
 #include "paint32.h"
 #include "resource.h"
-#define ERRORMESSAGEBOXFLAGS (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM)
 #define LOADSTRING_MAX 32
 
-static
-HWND WINAPI CreateApplicationWindow(
-	_In_opt_ HINSTANCE hInstance);
+static HWND WINAPI CreateApplicationWindow(_In_opt_ HINSTANCE hInstance);
+static BOOL WINAPI RegisterCommonClasses(void);
+static BOOL WINAPI RegisterPrivateClasses(_In_opt_ HINSTANCE hInstance);
 
-static
-BOOL WINAPI RegisterCommonClasses(
-	void);
-
-static
-BOOL WINAPI RegisterPrivateClasses(
-	_In_opt_ HINSTANCE hInstance);
-
+/*
+アプリケーションのメイン エントリ ポイントです。
+*/
 EXTERN_C
 int APIENTRY _tWinMain(
 	_In_ HINSTANCE hInstance,
@@ -69,6 +63,9 @@ int APIENTRY _tWinMain(
 	return nExitCode;
 }
 
+/*
+新しいアプリケーション ウィンドウを作成します。
+*/
 static
 HWND WINAPI CreateApplicationWindow(
 	_In_opt_ HINSTANCE hInstance)
@@ -78,6 +75,9 @@ HWND WINAPI CreateApplicationWindow(
 	return CreateWindow(APPLICATIONCLASSNAME, strCaption, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
 }
 
+/*
+コモン コントロールを利用可能にします。
+*/
 static
 BOOL WINAPI RegisterCommonClasses(
 	void)
@@ -88,6 +88,9 @@ BOOL WINAPI RegisterCommonClasses(
 	return InitCommonControlsEx(&icc);
 }
 
+/*
+プライベート ウィンドウを利用可能にします。
+*/
 static
 BOOL WINAPI RegisterPrivateClasses(
 	_In_opt_ HINSTANCE hInstance)
