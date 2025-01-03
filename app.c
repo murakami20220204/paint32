@@ -63,9 +63,7 @@ static HWND WINAPI CreateToolbar(_In_ HWND hWnd, _In_opt_ HINSTANCE hInstance);
 static LPUSERDATA WINAPI CreateUserData( _In_ HWND hWnd);
 static LRESULT WINAPI DefProc(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
 static BOOL WINAPI DestroyUserData(_In_ HWND hWnd);
-static BOOL WINAPI LayoutBars(_In_ HWND hWnd, _Inout_ LPRECT lpClient);
-static BOOL WINAPI LayoutClient(_In_ HWND hWnd, _Inout_ LPRECT lpClient);
-static BOOL WINAPI LayoutDocks(_In_ HWND hWnd, _Inout_ LPRECT lpClient);
+static BOOL WINAPI LayoutControls(_In_ HWND hWnd);
 static LRESULT WINAPI OnAbout(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
 static LRESULT WINAPI OnCommand(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
 static LRESULT WINAPI OnCreate(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
@@ -346,58 +344,37 @@ BOOL WINAPI DestroyUserData(
 }
 
 static
-BOOL WINAPI LayoutBars(
-	_In_ HWND hWnd,
-	_Inout_ LPRECT lpClient)
+BOOL WINAPI LayoutControls(
+	_In_ HWND hWnd)
 {
-	HWND hWndBar;
-	RECT rcWindow;
-
-	if (hWndBar = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDTOOLBAR))
-	{
-		SendMessage(hWndBar, WM_SIZE, 0, 0);
-		ShowWindow(hWndBar, SW_SHOW);
-		if (GetWindowRect(hWndBar, &rcWindow)) lpClient->top += rcWindow.bottom - rcWindow.top;
-	}
-	if (hWndBar = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDSTATUS))
-	{
-		SendMessage(hWndBar, WM_SIZE, 0, 0);
-		ShowWindow(hWndBar, SW_SHOW);
-		if (GetWindowRect(hWndBar, &rcWindow)) lpClient->bottom -= rcWindow.bottom - rcWindow.top;
-	}
-
-	return FALSE;
-}
-
-static
-BOOL WINAPI LayoutClient(
-	_In_ HWND hWnd,
-	_Inout_ LPRECT lpClient)
-{
-	HWND hWndClient;
+	HWND hWndChild;
+	RECT rcClient, rcWindow;
 	BOOL bResult;
-	hWndClient = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDCLIENT);
+	bResult = GetClientRect(hWnd, &rcClient);
 
-	if (hWndClient)
+	if (bResult)
 	{
-		lpClient->right -= lpClient->left;
-		lpClient->bottom -= lpClient->top;
-		bResult = SetWindowPos(hWndClient, NULL, lpClient->left, lpClient->top, lpClient->right, lpClient->bottom, SWP_NOZORDER | SWP_SHOWWINDOW);
-	}
-	else
-	{
-		bResult = FALSE;
+		if (hWndChild = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDTOOLBAR))
+		{
+			SendMessage(hWndChild, WM_SIZE, 0, 0);
+			ShowWindow(hWndChild, SW_SHOW);
+			if (GetWindowRect(hWndChild, &rcWindow)) rcClient.top += rcWindow.bottom - rcWindow.top;
+		}
+		if (hWndChild = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDSTATUS))
+		{
+			SendMessage(hWndChild, WM_SIZE, 0, 0);
+			ShowWindow(hWndChild, SW_SHOW);
+			if (GetWindowRect(hWndChild, &rcWindow)) rcClient.bottom -= rcWindow.bottom - rcWindow.top;
+		}
+		if (hWndChild = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDCLIENT))
+		{
+			rcClient.right -= rcClient.left;
+			rcClient.bottom -= rcClient.top;
+			SetWindowPos(hWndChild, NULL, rcClient.left, rcClient.top, rcClient.right, rcClient.bottom, SWP_NOZORDER | SWP_SHOWWINDOW);
+		}
 	}
 
 	return bResult;
-}
-
-static
-BOOL WINAPI LayoutDocks(
-	_In_ HWND hWnd,
-	_Inout_ LPRECT lpClient)
-{
-	return FALSE;
 }
 
 static
@@ -424,11 +401,29 @@ LRESULT WINAPI OnCommand(
 
 	switch (LOWORD(wParam))
 	{
+	case IDM_ABOUT:
+		PostMessage(hWnd, APPLICATION_ABOUT, 0, 0);
+		break;
 	case IDM_EXIT:
 		PostMessage(hWnd, WM_CLOSE, 0, 0);
 		break;
 	case IDM_NEW:
 		PostMessage(hWnd, APPLICATION_NEW, 0, 0);
+		break;
+	case IDM_OUTLINE:
+		PostMessage(hWnd, APPLICATION_OUTLINE, 0, 0);
+		break;
+	case IDM_PALETTE:
+		PostMessage(hWnd, APPLICATION_PALETTE, 0, 0);
+		break;
+	case IDM_PREFERENCES:
+		PostMessage(hWnd, APPLICATION_PREFERENCES, 0, 0);
+		break;
+	case IDM_STATUS:
+		PostMessage(hWnd, APPLICATION_STATUS, 0, 0);
+		break;
+	case IDM_TOOLBAR:
+		PostMessage(hWnd, APPLICATION_TOOLBAR, 0, 0);
 		break;
 	default:
 		nResult = DefProc(hWnd, uMsg, wParam, lParam);
@@ -695,15 +690,7 @@ static LRESULT WINAPI OnSize(
 	_In_ WPARAM wParam,
 	_In_ LPARAM lParam)
 {
-	RECT rcClient;
-
-	if (GetClientRect(hWnd, &rcClient))
-	{
-		LayoutBars(hWnd, &rcClient);
-		LayoutDocks(hWnd, &rcClient);
-		LayoutClient(hWnd, &rcClient);
-	}
-
+	LayoutControls(hWnd);
 	return 0;
 }
 
@@ -714,7 +701,9 @@ LRESULT WINAPI OnStatus(
 	_In_ WPARAM wParam,
 	_In_ LPARAM lParam)
 {
-	return (LRESULT)ToggleWindow(hWnd, GWLP_HWNDSTATUS, CreateStatusBar);
+	ToggleWindow(hWnd, GWLP_HWNDSTATUS, CreateStatusBar);
+	LayoutControls(hWnd);
+	return 0;
 }
 
 static
@@ -724,7 +713,9 @@ LRESULT WINAPI OnToolbar(
 	_In_ WPARAM wParam,
 	_In_ LPARAM lParam)
 {
-	return (LRESULT)ToggleWindow(hWnd, GWLP_HWNDTOOLBAR, CreateToolbar);
+	ToggleWindow(hWnd, GWLP_HWNDTOOLBAR, CreateToolbar);
+	LayoutControls(hWnd);
+	return 0;
 }
 
 static

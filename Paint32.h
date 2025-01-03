@@ -132,9 +132,3 @@ int WINAPI ErrorMessageBox(
 EXTERN_C
 BOOL WINAPI SetWindowPosOnCenter(
 	_In_ HWND hWnd);
-
-EXTERN_C
-BOOL WINAPI SetWindowPosOnSize(
-	_In_ HWND hWnd,
-	_In_opt_ HWND hWndInsertAfter,
-	_In_ const RECT *lpRect);

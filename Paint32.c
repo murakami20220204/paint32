@@ -53,16 +53,3 @@ BOOL WINAPI SetWindowPosOnCenter(
 
 	return bResult;
 }
-
-EXTERN_C
-BOOL WINAPI SetWindowPosOnSize(
-	_In_ HWND hWnd,
-	_In_opt_ HWND hWndInsertAfter,
-	_In_ const RECT *lpRect)
-{
-	const int X = lpRect->left;
-	const int Y = lpRect->top;
-	const int nWidth = lpRect->right - X;
-	const int nHeight = lpRect->bottom - Y;
-	return SetWindowPos(hWnd, hWndInsertAfter, X, Y, nWidth, nHeight, SWP_SHOWWINDOW);
-}
