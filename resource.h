@@ -6,6 +6,7 @@
 #define IDR_MAIN                        101
 #define IDS_APPTITLE                    101
 #define IDD_ABOUT                       101
+#define IDR_APPLICATION                 101
 #define IDS_UNTITLED                    102
 #define IDD_COLOR                       102
 #define IDS_LAYER                       103
@@ -15,7 +16,6 @@
 #define IDS_FAVORITES                   107
 #define IDD_NEW                         107
 #define IDS_PREFERENCES                 108
-#define IDD_WINDOW                      108
 #define IDD_STARTUP                     108
 #define IDD_AUTOSAVE                    109
 #define IDC_CONTENT                     1001
@@ -55,6 +55,11 @@
 #define IDM_NEW                         40034
 #define ID_40037                        40037
 #define IDM_PREFERENCES                 40038
+#define ID_40039                        40039
+#define ID_40040                        40040
+#define IDM_TOOLBAR                     40041
+#define IDM_STATUS                      40042
+#define IDM_OUTLINE                     40043
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -62,7 +67,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        111
-#define _APS_NEXT_COMMAND_VALUE         40039
+#define _APS_NEXT_COMMAND_VALUE         40044
 #define _APS_NEXT_CONTROL_VALUE         1011
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

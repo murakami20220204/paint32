@@ -136,9 +136,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="about.c" />
+    <ClCompile Include="app.c" />
     <ClCompile Include="autosave.c" />
     <ClCompile Include="color.c" />
-    <ClCompile Include="framewnd.c" />
     <ClCompile Include="new.c" />
     <ClCompile Include="outline.c" />
     <ClCompile Include="Paint32.c" />
@@ -150,6 +150,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="winmain.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Paint32.h" />

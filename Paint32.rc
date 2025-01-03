@@ -49,7 +49,7 @@ END
 // Menu
 //
 
-IDR_MAIN MENU
+IDR_APPLICATION MENU
 BEGIN
     POPUP "ファイル(&F)"
     BEGIN
@@ -67,7 +67,10 @@ BEGIN
     END
     POPUP "表示(&V)"
     BEGIN
-        MENUITEM "レイヤー ウィンドウ(&L)",              IDM_LAYER
+        MENUITEM "ツールバー(&T)",                   IDM_TOOLBAR
+        MENUITEM "ステータス バー(&S)",                IDM_STATUS
+        MENUITEM SEPARATOR
+        MENUITEM "レイヤー ウィンドウ(&L)",              IDM_OUTLINE
         MENUITEM "パレット ウィンドウ(&P)",              IDM_PALETTE
     END
     POPUP "ツール(&T)"
@@ -95,7 +98,7 @@ END
 // Accelerator
 //
 
-IDR_MAIN ACCELERATORS
+IDR_APPLICATION ACCELERATORS
 BEGIN
     "O",            IDM_OPEN,               VIRTKEY, CONTROL, NOINVERT
     "N",            IDM_NEW,                VIRTKEY, CONTROL, NOINVERT
