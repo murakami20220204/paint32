@@ -5,7 +5,9 @@
 #define IDS_APPTITLE                    101
 #define IDI_PICTURE                     101
 #define IDR_APPLICATION                 102
+#define IDS_TOOLBAR                     102
 #define IDD_ABOUT                       105
+#define IDB_TOOLBAR                     107
 #define IDC_VERSION                     1001
 #define ID_40001                        40001
 #define ID_40002                        40002
@@ -18,7 +20,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        107
+#define _APS_NEXT_RESOURCE_VALUE        108
 #define _APS_NEXT_COMMAND_VALUE         40009
 #define _APS_NEXT_CONTROL_VALUE         1002
 #define _APS_NEXT_SYMED_VALUE           101

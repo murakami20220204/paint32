@@ -174,12 +174,21 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// Bitmap
+//
+
+IDB_TOOLBAR             BITMAP                  "Viewer32.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // String Table
 //
 
 STRINGTABLE
 BEGIN
     IDS_APPTITLE            "ピクチャ ビューアー"
+    IDS_TOOLBAR             "/New/Open/Save//"
 END
 
 #endif    // 日本語 (日本) resources
