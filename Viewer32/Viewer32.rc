@@ -179,6 +179,8 @@ END
 
 IDB_TOOLBAR             BITMAP                  "Viewer32.bmp"
 
+IDB_VIEWER16            BITMAP                  "Viewer16.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

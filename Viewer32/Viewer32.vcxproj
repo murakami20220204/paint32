@@ -161,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\Resources\picture.ico" />
+    <Image Include="Viewer16.bmp" />
     <Image Include="Viewer32.bmp" />
   </ItemGroup>
   <ItemGroup>

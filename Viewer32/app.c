@@ -96,10 +96,19 @@ LRESULT CALLBACK ApplicationWindowProc(
 		PostQuitMessage(0);
 		nResult = DefProc(hWnd, uMsg, wParam, lParam);
 		break;
+	case WM_DRAWITEM:
+		ImageList_Draw(((HIMAGELIST)GetWindowLongPtr(hWnd, GWLP_HIMAGELIST)), 0, ((LPDRAWITEMSTRUCT)lParam)->hDC, ((LPDRAWITEMSTRUCT)lParam)->rcItem.left, ((LPDRAWITEMSTRUCT)lParam)->rcItem.top, ILD_NORMAL);
+		return TRUE;
+		break;
 	case WM_DPICHANGED:
 		UpdateDpi(hWnd, LOWORD(wParam));
 		LayoutControls(hWnd);
 		nResult = DefProc(hWnd, uMsg, wParam, lParam);
+		break;
+	case WM_MEASUREITEM:
+		((LPMEASUREITEMSTRUCT)lParam)->itemWidth = 16;
+		((LPMEASUREITEMSTRUCT)lParam)->itemHeight = 16;
+		nResult = TRUE;
 		break;
 	case WM_NOTIFY:
 		switch (((LPNMHDR)lParam)->code)
@@ -384,14 +393,29 @@ BOOL WINAPI UpdateToolbarButtons(
 			ImageList_Destroy(hImageList);
 		}
 
-		//hImageList = ImageList_Create(32, 32, ILC_MASK | ILC_COLOR4, 4, 0);
-		hImageList = ImageList_LoadImage(hInstance, MAKEINTRESOURCE(IDB_TOOLBAR), 32, 0, CLR_DEFAULT, IMAGE_BITMAP, 0);
+		hImageList = ImageList_LoadImage(hInstance, MAKEINTRESOURCE(IDB_VIEWER16), 16, 0, CLR_DEFAULT, IMAGE_BITMAP, 0);
+		SetWindowLongPtr(hWnd, GWLP_HIMAGELIST, (LONG_PTR)hImageList);
 		SendMessage(hWndToolbar, TB_SETIMAGELIST, 0, (LPARAM)hImageList);
 
 		if (hImageList)
 		{
 			//ImageList_AddMasked(hImageList, LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_TOOLBAR)), CLR_DEFAULT);
 			bResult = TRUE;
+
+			HMENU hMenu;
+			MENUITEMINFO info;
+			hMenu = GetMenu(hWnd);
+
+			if (hMenu)
+			{
+				ZeroMemory(&info, sizeof info);
+				info.cbSize = sizeof info;
+				info.fMask = MIIM_BITMAP;
+				info.hbmpItem = HBMMENU_CALLBACK;
+				SetMenuItemInfo(hMenu, IDM_OPEN, FALSE, &info);
+				info.hbmpItem = HBMMENU_POPUP_CLOSE;
+				SetMenuItemInfo(hMenu, IDM_EXIT, FALSE, &info);
+			}
 		}
 	}
 

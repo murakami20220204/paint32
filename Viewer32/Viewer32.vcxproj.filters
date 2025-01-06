@@ -37,6 +37,9 @@
     <Image Include="Viewer32.bmp">
       <Filter>リソース ファイル</Filter>
     </Image>
+    <Image Include="Viewer16.bmp">
+      <Filter>リソース ファイル</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="winmain.c">
