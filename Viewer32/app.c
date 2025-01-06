@@ -224,7 +224,7 @@ HWND WINAPI CreateToolbar(
 	if (hWndToolbar)
 	{
 		SendMessage(hWndToolbar, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
-		SendMessage(hWndToolbar, TB_ADDSTRING, (WPARAM)hInstance, IDS_TOOLBAR);
+		//SendMessage(hWndToolbar, TB_ADDSTRING, (WPARAM)hInstance, IDS_TOOLBAR);
 		SendMessage(hWndToolbar, TB_ADDBUTTONS, ARRAYSIZE(TOOLBARBUTTONS), (LPARAM)TOOLBARBUTTONS);
 	}
 
@@ -245,6 +245,7 @@ BOOL WINAPI GetToolbarText(
 	_In_ HWND hWnd,
 	_Inout_ LPTOOLTIPTEXT lpTooltip)
 {
+#if 0
 	HWND hWndToolbar;
 	BOOL bResult;
 	TBBUTTONINFO info;
@@ -264,6 +265,28 @@ BOOL WINAPI GetToolbarText(
 	}
 
 	return bResult;
+#else
+	HMENU hMenu;
+	MENUITEMINFO info;
+	BOOL bResult;
+	hMenu = GetMenu(hWnd);
+
+	if (hMenu)
+	{
+		ZeroMemory(&info, sizeof info);
+		info.cbSize = sizeof info;
+		info.fMask = MIIM_STRING;
+		info.dwTypeData = lpTooltip->szText;
+		info.cch = ARRAYSIZE(lpTooltip->szText);
+		bResult = GetMenuItemInfo(hMenu, (UINT)lpTooltip->hdr.idFrom, FALSE, &info);
+	}
+	else
+	{
+		bResult = FALSE;
+	}
+
+	return bResult;
+#endif
 }
 
 static
@@ -361,12 +384,13 @@ BOOL WINAPI UpdateToolbarButtons(
 			ImageList_Destroy(hImageList);
 		}
 
-		hImageList = ImageList_Create(32, 32, ILC_MASK | ILC_COLOR4, 4, 0);
+		//hImageList = ImageList_Create(32, 32, ILC_MASK | ILC_COLOR4, 4, 0);
+		hImageList = ImageList_LoadImage(hInstance, MAKEINTRESOURCE(IDB_TOOLBAR), 32, 0, CLR_DEFAULT, IMAGE_BITMAP, 0);
 		SendMessage(hWndToolbar, TB_SETIMAGELIST, 0, (LPARAM)hImageList);
 
 		if (hImageList)
 		{
-			ImageList_AddMasked(hImageList, LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_TOOLBAR)), CLR_DEFAULT);
+			//ImageList_AddMasked(hImageList, LoadBitmap(hInstance, MAKEINTRESOURCE(IDB_TOOLBAR)), CLR_DEFAULT);
 			bResult = TRUE;
 		}
 	}
