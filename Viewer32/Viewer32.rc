@@ -109,8 +109,30 @@ BEGIN
     POPUP "ファイル(&F)"
     BEGIN
         MENUITEM "開く(&O)...\tCtrl+O",           IDM_OPEN
+        MENUITEM "次を開く(&N)\tHome",              IDM_OPENNEXT
+        MENUITEM "前を開く(&P)\tEnd",               IDM_OPENPRIOR
+        MENUITEM SEPARATOR
+        MENUITEM "印刷(&P)...\tCtrl+P",           IDM_PRINT
         MENUITEM SEPARATOR
         MENUITEM "終了(&X)\tAlt+F4",              IDM_EXIT
+    END
+    POPUP "編集(&E)"
+    BEGIN
+        MENUITEM "ページ戻し(&U)\tPage Up",          IDM_PAGEPRIOR
+        MENUITEM "ページ送り(&D)\tPage Down",        IDM_PAGENEXT
+    END
+    POPUP "表示(&V)"
+    BEGIN
+        POPUP "ズーム(&Z)"
+        BEGIN
+            MENUITEM "拡大(&I)\tCtrl+プラス",            IDM_ZOOMIN
+            MENUITEM "縮小(O)\tCtrl+マイナス",            IDM_ZOOMOUT
+            MENUITEM SEPARATOR
+            MENUITEM "既定の拡大率に戻す(&D)\tCtrl+0",       IDM_ZOOM
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "ツールバー(&T)",                   IDM_TOOLBARWINDOW
+        MENUITEM "ステータス バー(&S)",                IDM_STATUSWINDOW
     END
     POPUP "ヘルプ(&H)"
     BEGIN
@@ -127,6 +149,14 @@ END
 IDR_VIEWER ACCELERATORS
 BEGIN
     "O",            IDM_OPEN,               VIRTKEY, CONTROL, NOINVERT
+    VK_END,         IDM_OPENNEXT,           VIRTKEY, NOINVERT
+    VK_HOME,        IDM_OPENPRIOR,          VIRTKEY, NOINVERT
+    "P",            IDM_PRINT,              VIRTKEY, CONTROL, NOINVERT
+    VK_PRIOR,       IDM_PAGEPRIOR,          VIRTKEY, NOINVERT
+    VK_NEXT,        IDM_PAGENEXT,           VIRTKEY, NOINVERT
+    "0",            IDM_ZOOM,               VIRTKEY, CONTROL, NOINVERT
+    VK_OEM_PLUS,    IDM_ZOOMIN,             VIRTKEY, CONTROL, NOINVERT
+    VK_OEM_MINUS,   IDM_ZOOMOUT,            VIRTKEY, CONTROL, NOINVERT
 END
 
 
