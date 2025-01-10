@@ -18,10 +18,7 @@
     <ClInclude Include="resource.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="app.h">
+    <ClInclude Include="Paint32.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
@@ -31,7 +28,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\Resources\pen.ico">
+    <Image Include="Paint32.ico">
       <Filter>リソース ファイル</Filter>
     </Image>
   </ItemGroup>
@@ -39,8 +36,19 @@
     <ClCompile Include="winmain.c">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="app.c">
+    <ClCompile Include="about.c">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="paint.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Paint32.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="Paint32.manifest">
+      <Filter>リソース ファイル</Filter>
+    </Manifest>
   </ItemGroup>
 </Project>

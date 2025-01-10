@@ -3,13 +3,15 @@ Copyright 2025 Taichi Murakami.
 アプリケーションのメイン エントリ ポイントを実装します。
 */
 
-#include "stdafx.h"
-#include "app.h"
+#include <windows.h>
+#include <commctrl.h>
+#include <tchar.h>
+#include "Viewer32.h"
 #include "resource.h"
-#include "shared.h"
+
 #define LOADSTRING_MAX 32
 
-static HWND WINAPI CreateApplicationWindow(_In_opt_ HINSTANCE hInstance);
+static HWND WINAPI CreateViewerWindow(_In_opt_ HINSTANCE hInstance);
 static BOOL WINAPI RegisterCommonClasses(void);
 static BOOL WINAPI RegisterPrivateClasses(_In_opt_ HINSTANCE hInstance);
 
@@ -32,30 +34,36 @@ int APIENTRY _tWinMain(
 
 	if (SUCCEEDED(hResult))
 	{
-		if (RegisterCommonClasses() &&
-			RegisterPrivateClasses(hInstance) &&
-			(hWnd = CreateApplicationWindow(hInstance)))
+		if (RegisterCommonClasses() && RegisterPrivateClasses(hInstance))
 		{
-			ShowWindow(hWnd, nCmdShow);
-			UpdateWindow(hWnd);
-			hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_APPLICATION));
+			hWnd = CreateViewerWindow(hInstance);
 
-			while ((bResult = GetMessage(&msg, NULL, 0, 0)) > 0)
+			if (hWnd)
 			{
-				if (!TranslateAccelerator(hWnd, hAccel, &msg))
+				ShowWindow(hWnd, nCmdShow);
+				UpdateWindow(hWnd);
+				hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_VIEWER));
+				bResult = GetMessage(&msg, NULL, 0, 0);
+
+				while (bResult > 0)
 				{
-					TranslateMessage(&msg);
-					DispatchMessage(&msg);
+					if (!TranslateAccelerator(hWnd, hAccel, &msg))
+					{
+						TranslateMessage(&msg);
+						DispatchMessage(&msg);
+					}
+
+					bResult = GetMessage(&msg, NULL, 0, 0);
+				}
+				if (!bResult)
+				{
+					bResult = (int)msg.wParam;
 				}
 			}
-			if (bResult)
-			{
-				hResult = HRESULT_FROM_WIN32(GetLastError());
-			}
-			else
-			{
-				bResult = (int)msg.wParam;
-			}
+		}
+		if (bResult)
+		{
+			hResult = HRESULT_FROM_WIN32(GetLastError());
 		}
 
 		CoUninitialize();
@@ -72,12 +80,12 @@ int APIENTRY _tWinMain(
 新しいアプリケーション ウィンドウを作成します。
 */
 static
-HWND WINAPI CreateApplicationWindow(
+HWND WINAPI CreateViewerWindow(
 	_In_opt_ HINSTANCE hInstance)
 {
 	TCHAR strCaption[LOADSTRING_MAX];
 	LoadString(hInstance, IDS_APPTITLE, strCaption, LOADSTRING_MAX);
-	return CreateWindow(APPLICATIONCLASSNAME, strCaption, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
+	return CreateWindow(VIEWERCLASSNAME, strCaption, WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
 }
 
 /*
@@ -105,13 +113,13 @@ BOOL WINAPI RegisterPrivateClasses(
 	ZeroMemory(&wc, sizeof wc);
 	wc.cbSize = sizeof wc;
 	wc.style = CS_VREDRAW | CS_HREDRAW;
-	wc.lpfnWndProc = ApplicationWindowProc;
-	wc.cbWndExtra = APPLICATIONWINDOWEXTRA;
+	wc.lpfnWndProc = ViewerWindowProc;
+	wc.cbWndExtra = VIEWERWINDOWEXTRA;
 	wc.hInstance = hInstance;
-	wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_PICTURE));
+	wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_VIEWER));
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
-	wc.lpszMenuName = MAKEINTRESOURCE(IDR_APPLICATION);
-	wc.lpszClassName = APPLICATIONCLASSNAME;
+	wc.lpszMenuName = MAKEINTRESOURCE(IDR_VIEWER);
+	wc.lpszClassName = VIEWERCLASSNAME;
 	return RegisterClassEx(&wc);
 }

@@ -18,10 +18,7 @@
     <ClInclude Include="resource.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="app.h">
+    <ClInclude Include="Viewer32.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
@@ -31,13 +28,13 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\Resources\picture.ico">
-      <Filter>リソース ファイル</Filter>
-    </Image>
     <Image Include="Viewer32.bmp">
       <Filter>リソース ファイル</Filter>
     </Image>
     <Image Include="Viewer16.bmp">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="Viewer32.ico">
       <Filter>リソース ファイル</Filter>
     </Image>
   </ItemGroup>
@@ -45,8 +42,19 @@
     <ClCompile Include="winmain.c">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="app.c">
+    <ClCompile Include="about.c">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Viewer32.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="viewer.c">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="Viewer32.manifest">
+      <Filter>リソース ファイル</Filter>
+    </Manifest>
   </ItemGroup>
 </Project>

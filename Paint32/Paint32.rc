@@ -90,7 +90,7 @@ END
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_PEN                 ICON                    "..\\Resources\\pen.ico"
+IDI_PAINT               ICON                    "Paint32.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -98,16 +98,14 @@ IDI_PEN                 ICON                    "..\\Resources\\pen.ico"
 // Dialog
 //
 
-IDD_ABOUT DIALOGEX 0, 0, 215, 115
+IDD_ABOUT DIALOGEX 0, 0, 215, 85
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "バージョン情報"
 FONT 9, "MS Shell Dlg", 400, 0, 0x80
 BEGIN
-    ICON            IDI_PEN,IDC_STATIC,7,7,20,20
-    LTEXT           "お絵かきソフト\r\nCopyright © 2025 Taichi Murakami. All rights reserved.",IDC_STATIC,57,7,151,50
-    LTEXT           "バージョン:",IDC_STATIC,57,61,50,8
-    LTEXT           "0.0.0.0",IDC_VERSION,111,61,97,8
-    DEFPUSHBUTTON   "閉じる",IDOK,158,93,50,15
+    ICON            IDI_PAINT,IDC_STATIC,7,7,20,20
+    LTEXT           "お絵かきソフト\r\nCopyright © 2025 Taichi Murakami. All rights reserved.",IDC_STATIC,57,7,151,49
+    DEFPUSHBUTTON   "閉じる",IDOK,158,63,50,15
 END
 
 
@@ -116,7 +114,7 @@ END
 // Menu
 //
 
-IDR_APPLICATION MENU
+IDR_PAINT MENU
 BEGIN
     POPUP "ファイル(&F)"
     BEGIN
@@ -136,7 +134,7 @@ END
 // Accelerator
 //
 
-IDR_APPLICATION ACCELERATORS
+IDR_PAINT ACCELERATORS
 BEGIN
     "N",            IDM_NEW,                VIRTKEY, CONTROL, NOINVERT
 END
@@ -155,7 +153,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 208
         TOPMARGIN, 7
-        BOTTOMMARGIN, 108
+        BOTTOMMARGIN, 78
     END
 END
 #endif    // APSTUDIO_INVOKED

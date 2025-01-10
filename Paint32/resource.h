@@ -2,9 +2,9 @@
 // Microsoft Visual C++ で生成されたインクルード ファイル。
 // Paint32.rc で使用
 //
-#define IDI_ICON1                       101
-#define IDI_PEN                         101
 #define IDS_APPTITLE                    101
+#define IDI_PAINT                       101
+#define IDR_PAINT                       101
 #define IDS_UNTITLED                    102
 #define IDR_APPLICATION                 103
 #define IDD_ABOUT                       105

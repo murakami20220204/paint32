@@ -3,12 +3,11 @@
 // Viewer32.rc で使用
 //
 #define IDS_APPTITLE                    101
-#define IDI_PICTURE                     101
-#define IDR_APPLICATION                 102
+#define IDI_VIEWER                      101
 #define IDS_TOOLBAR                     102
+#define IDR_VIEWER                      101
 #define IDD_ABOUT                       105
 #define IDB_TOOLBAR                     107
-#define IDB_BITMAP1                     108
 #define IDB_VIEWER16                    108
 #define IDC_VERSION                     1001
 #define ID_40001                        40001

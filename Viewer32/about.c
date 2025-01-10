@@ -3,12 +3,9 @@ Copyright 2025 Taichi Murakami.
 バージョン情報ダイアログ プロシージャを実装します。
 */
 
-#include "stdafx.h"
-#include "resource.h"
-#include "shared.h"
-#define LOADSTRING_MAX 32
-
-static BOOL WINAPI Initialize(_In_ HWND hDlg);
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include "Viewer32.h"
 
 /*
 バージョン情報ダイアログ プロシージャ。
@@ -25,36 +22,19 @@ INT_PTR CALLBACK AboutDialogProc(
 	switch (uMsg)
 	{
 	case WM_CLOSE:
-	case WM_COMMAND:
 		EndDialog(hDlg, 0);
+		bResult = FALSE;
+	case WM_COMMAND:
+		EndDialog(hDlg, LOWORD(wParam));
 		bResult = FALSE;
 		break;
 	case WM_INITDIALOG:
-		Initialize(hDlg);
 		SetWindowPosOnCenter(hDlg);
 		bResult = TRUE;
 		break;
 	default:
 		bResult = FALSE;
 		break;
-	}
-
-	return bResult;
-}
-
-static
-BOOL WINAPI Initialize(
-	_In_ HWND hDlg)
-{
-	HINSTANCE hInstance;
-	BOOL bResult;
-	TCHAR strText[LOADSTRING_MAX];
-	hInstance = (HINSTANCE)GetWindowLongPtr(hDlg, GWLP_HINSTANCE);
-	bResult = GetVersionFromResource(hInstance, strText, LOADSTRING_MAX);
-
-	if (bResult)
-	{
-		SetDlgItemText(hDlg, IDC_VERSION, strText);
 	}
 
 	return bResult;

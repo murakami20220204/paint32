@@ -7,8 +7,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Paint32", "Paint32\Paint32.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Viewer32", "Viewer32\Viewer32.vcxproj", "{54896FBA-B481-4F33-8012-4EB19888684C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Shared", "Shared\Shared.vcxitems", "{78A6CCC3-50E3-402A-8D2A-3FD8BC7C3500}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repository", "Repository", "{A9B97E13-6EF9-4A63-96CD-D5AF8A25E043}"
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
@@ -43,10 +41,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Shared\Shared.vcxitems*{54896fba-b481-4f33-8012-4eb19888684c}*SharedItemsImports = 4
-		Shared\Shared.vcxitems*{61c9bcb6-59cd-4c31-b821-49c01dfff0b2}*SharedItemsImports = 4
-		Shared\Shared.vcxitems*{78a6ccc3-50e3-402a-8d2a-3fd8bc7c3500}*SharedItemsImports = 9
 	EndGlobalSection
 EndGlobal
