@@ -207,8 +207,6 @@ END
 
 IDB_TOOLBAR             BITMAP                  "Viewer32.bmp"
 
-IDB_VIEWER16            BITMAP                  "Viewer16.bmp"
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -218,7 +216,7 @@ IDB_VIEWER16            BITMAP                  "Viewer16.bmp"
 STRINGTABLE
 BEGIN
     IDS_APPTITLE            "ピクチャ ビューアー"
-    IDS_TOOLBAR             "/New/Open/Save//"
+    IDS_TOOLBAR             "\\開く\\次を開く\\前を開く\\ページ送り\\ページ戻し\\拡大\\縮小\\既定の拡大率に戻す\\\\"
 END
 
 #endif    // 日本語 (日本) resources

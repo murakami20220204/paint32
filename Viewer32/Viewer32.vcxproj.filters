@@ -31,9 +31,6 @@
     <Image Include="Viewer32.bmp">
       <Filter>リソース ファイル</Filter>
     </Image>
-    <Image Include="Viewer16.bmp">
-      <Filter>リソース ファイル</Filter>
-    </Image>
     <Image Include="Viewer32.ico">
       <Filter>リソース ファイル</Filter>
     </Image>

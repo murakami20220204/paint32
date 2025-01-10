@@ -10,18 +10,6 @@ Copyright 2025 Taichi Murakami.
 #include "Viewer32.h"
 #include "resource.h"
 
-/* Status Parts */
-static const
-int STATUSPARTS[] = { 100, 200, -1 };
-
-/* Toolbar Buttons */
-static const
-TBBUTTON TOOLBARBUTTONS[] =
-{
-	{ 0, IDM_OPEN, TBSTATE_ENABLED, BTNS_AUTOSIZE, { 0 }, 0, 0 },
-	{ 0, 0,        0,               BTNS_SEP,    { 0 }, 0, 0 },
-};
-
 /* User Data */
 typedef struct tagUSERDATA
 {
@@ -49,6 +37,7 @@ typedef struct tagWINDOWEXTRA
 #define CXTOOLBAR               32
 #define DefProc                 DefWindowProc
 #define NUMSTATUSPARTS          ARRAYSIZE(STATUSPARTS)
+#define NUMTOOLBARBUTTONS       ARRAYSIZE(TOOLBARBUTTONS)
 #define OPENFILEFILTER          TEXT("All Files (*.*)\0*.*\0")
 #define DEFAULT_ZOOM            100
 #define GWL_DPI                 offsetof(WINDOWEXTRA, dwDpi)
@@ -66,6 +55,14 @@ typedef struct tagWINDOWEXTRA
 #define ID_HWNDTOOLBAR          3
 #define ID_STATUSZOOM           0
 #define ID_STATUSFRAME          1
+#define ID_TOOLBAROPEN          0
+#define ID_TOOLBAROPENNEXT      1
+#define ID_TOOLBAROPENPRIOR     2
+#define ID_TOOLBARPAGENEXT      3
+#define ID_TOOLBARPAGEPRIOR     4
+#define ID_TOOLBARZOOMIN        5
+#define ID_TOOLBARZOOMOUT       6
+#define ID_TOOLBARZOOM          7
 #define LOADSTRING_MAX          32
 #define MINTRACKSIZE_X          200
 #define MINTRACKSIZE_Y          200
@@ -105,6 +102,26 @@ static VOID WINAPI ResizeToolbarParts(_In_ HWND hWnd);
 static BOOL WINAPI ResizeWindow(_In_ HWND hWnd, _In_ CONST RECT FAR *lpWindow);
 static BOOL WINAPI UpdateStatusFrameText(_In_ HWND hWnd);
 static BOOL WINAPI UpdateStatusZoomText(_In_ HWND hWnd);
+
+/* Status Parts */
+static const
+int STATUSPARTS[] = { 100, 200, -1 };
+
+/* Toolbar Buttons */
+static const
+TBBUTTON TOOLBARBUTTONS[] =
+{
+	{ ID_TOOLBAROPEN,      IDM_OPEN,      TBSTATE_ENABLED, BTNS_AUTOSIZE },
+	{ ID_TOOLBAROPENPRIOR, IDM_OPENPRIOR, TBSTATE_ENABLED, BTNS_AUTOSIZE },
+	{ ID_TOOLBAROPENNEXT,  IDM_OPENNEXT,  TBSTATE_ENABLED, BTNS_AUTOSIZE },
+	{ 0,                   0,             0,               BTNS_SEP,     },
+	{ ID_TOOLBARPAGEPRIOR, IDM_PAGEPRIOR, TBSTATE_ENABLED, BTNS_AUTOSIZE },
+	{ ID_TOOLBARPAGENEXT,  IDM_PAGENEXT,  TBSTATE_ENABLED, BTNS_AUTOSIZE },
+	{ 0,                   0,             0,               BTNS_SEP      },
+	{ ID_TOOLBARZOOMOUT,   IDM_ZOOMOUT,   TBSTATE_ENABLED, BTNS_AUTOSIZE },
+	{ ID_TOOLBARZOOMIN,    IDM_ZOOMIN,    TBSTATE_ENABLED, BTNS_AUTOSIZE },
+	{ ID_TOOLBARZOOM,      IDM_ZOOM,      TBSTATE_ENABLED, BTNS_AUTOSIZE },
+};
 
 /*
 ビューアー ウィンドウ プロシージャ。
@@ -278,13 +295,22 @@ HWND WINAPI CreateToolbar(
 	_In_opt_ HINSTANCE hInstance)
 {
 	HWND hWndToolbar;
+	TBBUTTON Buttons[NUMTOOLBARBUTTONS];
+	UINT uIndex;
 	hWndToolbar = CreateWindowEx(WS_EX_HWNDTOOLBAR, TOOLBARCLASSNAME, NULL, WS_HWNDTOOLBAR, 0, 0, 0, 0, hWnd, (HMENU)ID_HWNDTOOLBAR, hInstance, NULL);
 
 	if (hWndToolbar)
 	{
+		CopyMemory(Buttons, TOOLBARBUTTONS, sizeof(TOOLBARBUTTONS));
+
+		for (uIndex = 0; uIndex < NUMTOOLBARBUTTONS; uIndex++)
+		{
+			Buttons[uIndex].iString = Buttons[uIndex].iBitmap;
+		}
+
 		SendMessage(hWndToolbar, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
 		SendMessage(hWndToolbar, TB_ADDSTRING, (WPARAM)hInstance, IDS_TOOLBAR);
-		SendMessage(hWndToolbar, TB_ADDBUTTONS, ARRAYSIZE(TOOLBARBUTTONS), (LPARAM)TOOLBARBUTTONS);
+		SendMessage(hWndToolbar, TB_ADDBUTTONS, NUMTOOLBARBUTTONS, (LPARAM)Buttons);
 	}
 
 	return hWndToolbar;

@@ -8,7 +8,6 @@
 #define IDS_TOOLBAR                     102
 #define IDD_ABOUT                       105
 #define IDB_TOOLBAR                     107
-#define IDB_VIEWER16                    108
 #define IDC_VERSION                     1001
 #define IDM_OPEN                        40003
 #define IDM_EXIT                        40004
