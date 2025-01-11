@@ -30,20 +30,27 @@ typedef struct tagWINDOWEXTRA
 	LONG dwFlags;
 	LONG dwFrameCount;
 	LONG dwFrameIndex;
+	LONG dwHeight;
+	LONG dwWidth;
 	LONG dwZoom;
 } WINDOWEXTRA;
 
 #define ALPHATHRESHOLDPERCENT   1.0
 #define CXTOOLBAR               32
 #define DefProc                 DefWindowProc
+#define MAXZOOM                 2000
+#define MINZOOM                 10
 #define NUMSTATUSPARTS          ARRAYSIZE(STATUSPARTS)
 #define NUMTOOLBARBUTTONS       ARRAYSIZE(TOOLBARBUTTONS)
 #define OPENFILEFILTER          TEXT("All Files (*.*)\0*.*\0")
+#define ZOOMFACTOR              25
 #define DEFAULT_ZOOM            100
 #define GWL_DPI                 offsetof(WINDOWEXTRA, dwDpi)
 #define GWL_FLAGS               offsetof(WINDOWEXTRA, dwFlags)
 #define GWL_FRAMECOUNT          offsetof(WINDOWEXTRA, dwFrameCount)
 #define GWL_FRAMEINDEX          offsetof(WINDOWEXTRA, dwFrameIndex)
+#define GWL_HEIGHT              offsetof(WINDOWEXTRA, dwHeight)
+#define GWL_WIDTH               offsetof(WINDOWEXTRA, dwWidth)
 #define GWL_ZOOM                offsetof(WINDOWEXTRA, dwZoom)
 #define GWLP_HBITMAP            offsetof(WINDOWEXTRA, lpBitmap)
 #define GWLP_HIMAGELIST         offsetof(WINDOWEXTRA, lpImageList)
@@ -55,6 +62,7 @@ typedef struct tagWINDOWEXTRA
 #define ID_HWNDTOOLBAR          3
 #define ID_STATUSZOOM           0
 #define ID_STATUSFRAME          1
+#define ID_STATUSSIZE           2
 #define ID_TOOLBAROPEN          0
 #define ID_TOOLBAROPENNEXT      1
 #define ID_TOOLBAROPENPRIOR     2
@@ -92,20 +100,25 @@ static VOID WINAPI OnDestroy(_In_ HWND hWnd);
 static VOID WINAPI OnDpiChanged(_In_ HWND hWnd, _In_ UINT uDpi, _In_ CONST RECT FAR *lpWindow);
 static BOOL WINAPI OnDrawItem(_In_ HWND hWnd, _In_ UINT idItem, _In_ CONST DRAWITEMSTRUCT FAR *lpParam);
 static VOID WINAPI OnGetMinMaxInfo(_In_ HWND hWnd, _Inout_ LPMINMAXINFO lpInfo);
+static VOID WINAPI OnInitMenuPopup(_In_ HWND hWnd, _In_ HMENU hMenu);
 static VOID WINAPI OnLoad(_In_ HWND hWnd);
 static BOOL WINAPI OnNotifyParent(_In_ HWND hWnd, _In_ UINT uNotify, _In_ UINT idChild, _In_ LPARAM lParam);
 static VOID WINAPI OnOpen(_In_ HWND hWnd);
 static VOID WINAPI OnStatusWindow(_In_ HWND hWnd);
 static VOID WINAPI OnToolbarWindow(_In_ HWND hWnd);
+static VOID WINAPI OnZoom(_In_ HWND hWnd, _In_ BOOL bIncrement);
 static BOOL WINAPI ResizeStatusParts(_In_ HWND hWnd);
 static VOID WINAPI ResizeToolbarParts(_In_ HWND hWnd);
 static BOOL WINAPI ResizeWindow(_In_ HWND hWnd, _In_ CONST RECT FAR *lpWindow);
+static BOOL WINAPI SetStatusValue(_In_ HWND hWnd, _In_ UINT uStatus, _In_ LPARAM lParam);
+static UINT WINAPI SetZoom(_In_ HWND hWnd, _In_ UINT uZoom);
 static BOOL WINAPI UpdateStatusFrameText(_In_ HWND hWnd);
+static BOOL WINAPI UpdateStatusSizeText(_In_ HWND hWnd);
 static BOOL WINAPI UpdateStatusZoomText(_In_ HWND hWnd);
 
 /* Status Parts */
 static const
-int STATUSPARTS[] = { 100, 200, -1 };
+int STATUSPARTS[] = { 100, 200, 300, -1 };
 
 /* Toolbar Buttons */
 static const
@@ -166,6 +179,10 @@ LRESULT CALLBACK ViewerWindowProc(
 		nResult = DefProc(hWnd, uMsg, wParam, lParam);
 		OnGetMinMaxInfo(hWnd, (LPMINMAXINFO)lParam);
 		break;
+	case WM_INITMENUPOPUP:
+		OnInitMenuPopup(hWnd, (HMENU)wParam);
+		nResult = DefProc(hWnd, uMsg, wParam, lParam);
+		break;
 	case WM_LOAD:
 		OnLoad(hWnd);
 		nResult = 0;
@@ -177,8 +194,23 @@ LRESULT CALLBACK ViewerWindowProc(
 	case WM_PARENTNOTIFY:
 		nResult = OnNotifyParent(hWnd, LOWORD(wParam), HIWORD(wParam), lParam) ? 0 : DefProc(hWnd, uMsg, wParam, lParam);
 		break;
+	case WM_SETZOOM:
+		nResult = SetZoom(hWnd, (UINT)wParam);
+		break;
 	case WM_SIZE:
 		LayoutChildren(hWnd);
+		nResult = 0;
+		break;
+	case WM_STATUSWINDOW:
+		OnStatusWindow(hWnd);
+		nResult = 0;
+		break;
+	case WM_TOOLBARWINDOW:
+		OnToolbarWindow(hWnd);
+		nResult = 0;
+		break;
+	case WM_ZOOM:
+		OnZoom(hWnd, LOWORD(wParam));
 		nResult = 0;
 		break;
 	default:
@@ -283,7 +315,10 @@ HWND WINAPI CreateStatusBar(
 
 	if (hWndStatus)
 	{
-		SendMessage(hWndStatus, SB_SETPARTS, 0, 0);
+		ResizeStatusParts(hWnd);
+		UpdateStatusFrameText(hWnd);
+		UpdateStatusSizeText(hWnd);
+		UpdateStatusZoomText(hWnd);
 	}
 
 	return hWndStatus;
@@ -294,6 +329,7 @@ HWND WINAPI CreateToolbar(
 	_In_ HWND hWnd,
 	_In_opt_ HINSTANCE hInstance)
 {
+	HIMAGELIST hImageList;
 	HWND hWndToolbar;
 	TBBUTTON Buttons[NUMTOOLBARBUTTONS];
 	UINT uIndex;
@@ -301,6 +337,7 @@ HWND WINAPI CreateToolbar(
 
 	if (hWndToolbar)
 	{
+		hImageList = (HIMAGELIST)GetWindowLongPtr(hWnd, GWLP_HIMAGELIST);
 		CopyMemory(Buttons, TOOLBARBUTTONS, sizeof(TOOLBARBUTTONS));
 
 		for (uIndex = 0; uIndex < NUMTOOLBARBUTTONS; uIndex++)
@@ -311,6 +348,11 @@ HWND WINAPI CreateToolbar(
 		SendMessage(hWndToolbar, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
 		SendMessage(hWndToolbar, TB_ADDSTRING, (WPARAM)hInstance, IDS_TOOLBAR);
 		SendMessage(hWndToolbar, TB_ADDBUTTONS, NUMTOOLBARBUTTONS, (LPARAM)Buttons);
+
+		if (hImageList)
+		{
+			SendMessage(hWndToolbar, TB_SETIMAGELIST, 0, (LPARAM)hImageList);
+		}
 	}
 
 	return hWndToolbar;
@@ -415,6 +457,18 @@ BOOL WINAPI OnCommand(
 		break;
 	case IDM_OPEN:
 		bResult = PostMessage(hWnd, WM_OPEN, 0, 0);
+		break;
+	case IDM_STATUSWINDOW:
+		bResult = PostMessage(hWnd, WM_STATUSWINDOW, 0, 0);
+		break;
+	case IDM_TOOLBARWINDOW:
+		bResult = PostMessage(hWnd, WM_TOOLBARWINDOW, 0, 0);
+		break;
+	case IDM_ZOOMIN:
+		bResult = PostMessage(hWnd, WM_ZOOM, TRUE, 0);
+		break;
+	case IDM_ZOOMOUT:
+		bResult = PostMessage(hWnd, WM_ZOOM, FALSE, 0);
 		break;
 	}
 
@@ -714,6 +768,49 @@ VOID WINAPI OnGetMinMaxInfo(
 	lpInfo->ptMinTrackSize.y = max(lpInfo->ptMinTrackSize.y, ptSize.y);
 }
 
+static
+VOID WINAPI OnInitMenuPopup(
+	_In_ HWND hWnd,
+	_In_ HMENU hMenu)
+{
+	MENUITEMINFO item;
+	int nCount, nIndex;
+	ZeroMemory(&item, sizeof item);
+	item.cbSize = sizeof item;
+	nCount = GetMenuItemCount(hMenu);
+
+	for (nIndex = 0; nIndex < nCount; nIndex++)
+	{
+		item.fMask = MIIM_STATE | MIIM_ID;
+
+		if (GetMenuItemInfo(hMenu, nIndex, TRUE, &item))
+		{
+			switch (item.wID)
+			{
+			case IDM_PRINT:
+				item.fMask = MIIM_STATE;
+				item.fState = GetWindowLongPtr(hWnd, GWLP_HBITMAP) ? (item.fState & ~MFS_DISABLED) : (item.fState | MFS_DISABLED);
+				break;
+			case IDM_STATUSWINDOW:
+				item.fMask = MIIM_STATE;
+				item.fState = GetWindowLongPtr(hWnd, GWLP_HWNDSTATUS) ? (item.fState | MFS_CHECKED) : (item.fState & ~MFS_CHECKED);
+				break;
+			case IDM_TOOLBARWINDOW:
+				item.fMask = MIIM_STATE;
+				item.fState = GetWindowLongPtr(hWnd, GWLP_HWNDTOOLBAR) ? (item.fState | MFS_CHECKED) : (item.fState & ~MFS_CHECKED);
+				break;
+			default:
+				item.fMask = 0;
+				break;
+			}
+			if (item.fMask)
+			{
+				SetMenuItemInfo(hMenu, nIndex, TRUE, &item);
+			}
+		}
+	}
+}
+
 /*
 現在のファイル名で画像ファイルを開きます。
 */
@@ -862,23 +959,20 @@ static
 VOID WINAPI OnStatusWindow(
 	_In_ HWND hWnd)
 {
-	HANDLE handle;
-	handle = (HANDLE)GetWindowLongPtr(hWnd, GWLP_HWNDSTATUS);
+	HANDLE Handle;
+	Handle = (HANDLE)GetWindowLongPtr(hWnd, GWLP_HWNDSTATUS);
 
-	if (handle)
+	if (Handle)
 	{
-		PostMessage((HWND)handle, WM_CLOSE, 0, 0);
+		SendMessage((HWND)Handle, WM_CLOSE, 0, 0);
 	}
 	else
 	{
-		handle = (HANDLE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE);
-
-		if (CreateStatusBar(hWnd, (HINSTANCE)handle))
-		{
-			ResizeStatusParts(hWnd);
-			LayoutChildren(hWnd);
-		}
+		Handle = (HANDLE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE);
+		CreateStatusBar(hWnd, (HINSTANCE)Handle);
 	}
+
+	LayoutChildren(hWnd);
 }
 
 /*
@@ -888,21 +982,37 @@ static
 VOID WINAPI OnToolbarWindow(
 	_In_ HWND hWnd)
 {
-	HANDLE handle;
-	handle = (HANDLE)GetWindowLongPtr(hWnd, GWLP_HWNDTOOLBAR);
+	HANDLE Handle;
+	Handle = (HANDLE)GetWindowLongPtr(hWnd, GWLP_HWNDTOOLBAR);
 
-	if (handle)
+	if (Handle)
 	{
-		PostMessage((HWND)handle, WM_CLOSE, 0, 0);
+		SendMessage((HWND)Handle, WM_CLOSE, 0, 0);
 	}
 	else
 	{
-		handle = (HANDLE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE);
+		Handle = (HANDLE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE);
+		CreateToolbar(hWnd, (HINSTANCE)Handle);
+	}
 
-		if (CreateToolbar(hWnd, (HINSTANCE)handle))
-		{
-			LayoutChildren(hWnd);
-		}
+	LayoutChildren(hWnd);
+}
+
+static
+VOID WINAPI OnZoom(
+	_In_ HWND hWnd,
+	_In_ BOOL bIncrement)
+{
+	int nResult, nZoom;
+	nZoom = GetWindowLong(hWnd, GWL_ZOOM);
+	nResult = DEFAULT_ZOOM + (bIncrement ? ZOOMFACTOR : -ZOOMFACTOR);
+	nResult = MulDiv(nZoom, nResult, DEFAULT_ZOOM);
+	nResult = max(nResult, MINZOOM);
+	nResult = min(nResult, MAXZOOM);
+
+	if (nResult != nZoom)
+	{
+		PostMessage(hWnd, WM_SETZOOM, nResult, 0);
 	}
 }
 
@@ -978,6 +1088,59 @@ BOOL WINAPI ResizeWindow(
 }
 
 /*
+ステータス バーに値を表示します。
+*/
+static
+BOOL WINAPI SetStatusValue(
+	_In_ HWND hWnd,
+	_In_ UINT uStatus,
+	_In_ LPARAM lParam)
+{
+	HWND hWndStatus;
+	BOOL bResult;
+	TCHAR strText[LOADSTRING_MAX];
+	hWndStatus = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDSTATUS);
+
+	if (hWndStatus)
+	{
+		switch (uStatus)
+		{
+		case ID_STATUSFRAME:
+			bResult = SUCCEEDED(StringCchPrintf(strText, LOADSTRING_MAX, TEXT("Page: %u/%u"), LOWORD(lParam), HIWORD(lParam)));
+			break;
+		case ID_STATUSSIZE:
+			bResult = SUCCEEDED(StringCchPrintf(strText, LOADSTRING_MAX, TEXT("Size: (%u, %u)"), LOWORD(lParam), HIWORD(lParam)));
+			break;
+		case ID_STATUSZOOM:
+			bResult = SUCCEEDED(StringCchPrintf(strText, LOADSTRING_MAX, TEXT("Zoom: %u%%"), LOWORD(lParam)));
+			break;
+		default:
+			bResult = FALSE;
+			break;
+		}
+		if (bResult)
+		{
+			SendMessage(hWndStatus, SB_SETTEXT, uStatus, (LPARAM)strText);
+		}
+	}
+	else
+	{
+		bResult = FALSE;
+	}
+
+	return bResult;
+}
+
+static
+UINT WINAPI SetZoom(
+	_In_ HWND hWnd,
+	_In_ UINT uZoom)
+{
+	SetStatusValue(hWnd, ID_STATUSZOOM, uZoom);
+	return SetWindowLong(hWnd, GWL_ZOOM, uZoom);
+}
+
+/*
 ステータス バーにページ数を表示します。
 */
 static
@@ -996,6 +1159,34 @@ BOOL WINAPI UpdateStatusFrameText(
 		uIndex = GetWindowLong(hWnd, GWL_FRAMEINDEX) + 1;
 		bResult = SUCCEEDED(StringCchPrintf(strText, LOADSTRING_MAX, TEXT("Page: %u/%u"), uIndex, uCount));
 		SendMessage(hWndStatus, SB_SETTEXT, ID_STATUSFRAME, (LPARAM)strText);
+	}
+	else
+	{
+		bResult = FALSE;
+	}
+
+	return bResult;
+}
+
+/*
+ステータス バーに画像の大きさを表示します。
+*/
+static
+BOOL WINAPI UpdateStatusSizeText(
+	_In_ HWND hWnd)
+{
+	HWND hWndStatus;
+	UINT uHeight, uWidth;
+	BOOL bResult;
+	TCHAR strText[LOADSTRING_MAX];
+	hWndStatus = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDSTATUS);
+
+	if (hWndStatus)
+	{
+		uWidth = GetWindowLong(hWnd, GWL_WIDTH);
+		uHeight = GetWindowLong(hWnd, GWL_HEIGHT);
+		bResult = SUCCEEDED(StringCchPrintf(strText, LOADSTRING_MAX, TEXT("Size: (%u, %u)"), uWidth, uHeight));
+		SendMessage(hWndStatus, SB_SETTEXT, ID_STATUSSIZE, (LPARAM)strText);
 	}
 	else
 	{

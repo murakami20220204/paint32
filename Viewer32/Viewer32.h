@@ -14,10 +14,10 @@ Copyright 2025 Taichi Murakami.
 /* Window Extra */
 #ifdef _WIN64
 #define PICTUREWINDOWEXTRA      0
-#define VIEWERWINDOWEXTRA       64
+#define VIEWERWINDOWEXTRA       72
 #else
 #define PICTUREWINDOWEXTRA      0
-#define VIEWERWINDOWEXTRA       40
+#define VIEWERWINDOWEXTRA       48
 #endif
 
 /* Application Window Messages */
@@ -25,6 +25,10 @@ Copyright 2025 Taichi Murakami.
 #define WM_DECODE               0x0FFD
 #define WM_LOAD                 0x0FFE
 #define WM_OPEN                 0x0FFF
+#define WM_SETZOOM              0x0FFB
+#define WM_STATUSWINDOW         0x0FF9
+#define WM_TOOLBARWINDOW        0x0FF8
+#define WM_ZOOM                 0x0FFA
 
 /* External Functions */
 EXTERN_C int WINAPI ErrorMessageBox(_In_opt_ HINSTANCE hInstance, _In_opt_ HWND hWnd, _In_ DWORD dwError);
