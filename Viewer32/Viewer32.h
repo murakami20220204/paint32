@@ -25,6 +25,7 @@ Copyright 2025 Taichi Murakami.
 #define WM_DECODE               0x0FFD
 #define WM_LOAD                 0x0FFE
 #define WM_OPEN                 0x0FFF
+#define WM_SETFRAMEINDEX        0x0FF7
 #define WM_SETZOOM              0x0FFB
 #define WM_STATUSWINDOW         0x0FF9
 #define WM_TOOLBARWINDOW        0x0FF8

@@ -35,6 +35,12 @@ typedef struct tagWINDOWEXTRA
 	LONG dwZoom;
 } WINDOWEXTRA;
 
+typedef struct tagZOOMSTRUCT
+{
+	UINT uNext;
+	UINT uPrevious;
+} ZOOMSTRUCT, FAR *LPZOOMSTRUCT;
+
 #define ALPHATHRESHOLDPERCENT   1.0
 #define CXTOOLBAR               32
 #define DefProc                 DefWindowProc
@@ -45,6 +51,7 @@ typedef struct tagWINDOWEXTRA
 #define OPENFILEFILTER          TEXT("All Files (*.*)\0*.*\0")
 #define ZOOMFACTOR              25
 #define DEFAULT_ZOOM            100
+#define DEFAULT_ZOOMINDEX       4
 #define GWL_DPI                 offsetof(WINDOWEXTRA, dwDpi)
 #define GWL_FLAGS               offsetof(WINDOWEXTRA, dwFlags)
 #define GWL_FRAMECOUNT          offsetof(WINDOWEXTRA, dwFrameCount)
@@ -102,15 +109,16 @@ static BOOL WINAPI OnDrawItem(_In_ HWND hWnd, _In_ UINT idItem, _In_ CONST DRAWI
 static VOID WINAPI OnGetMinMaxInfo(_In_ HWND hWnd, _Inout_ LPMINMAXINFO lpInfo);
 static VOID WINAPI OnInitMenuPopup(_In_ HWND hWnd, _In_ HMENU hMenu);
 static VOID WINAPI OnLoad(_In_ HWND hWnd);
-static BOOL WINAPI OnNotifyParent(_In_ HWND hWnd, _In_ UINT uNotify, _In_ UINT idChild, _In_ LPARAM lParam);
 static VOID WINAPI OnOpen(_In_ HWND hWnd);
+static BOOL WINAPI OnParentNotify(_In_ HWND hWnd, _In_ UINT uNotify, _In_ UINT idChild, _In_ LPARAM lParam);
 static VOID WINAPI OnStatusWindow(_In_ HWND hWnd);
 static VOID WINAPI OnToolbarWindow(_In_ HWND hWnd);
 static VOID WINAPI OnZoom(_In_ HWND hWnd, _In_ BOOL bIncrement);
+static int CDECL OnZoomProc(_In_opt_ LPVOID lpContext, _In_ LPCVOID lpFirst, _In_ LPCVOID lpSecond);
 static BOOL WINAPI ResizeStatusParts(_In_ HWND hWnd);
 static VOID WINAPI ResizeToolbarParts(_In_ HWND hWnd);
 static BOOL WINAPI ResizeWindow(_In_ HWND hWnd, _In_ CONST RECT FAR *lpWindow);
-static BOOL WINAPI SetStatusValue(_In_ HWND hWnd, _In_ UINT uStatus, _In_ LPARAM lParam);
+static UINT WINAPI SetFrameIndex(_In_ HWND hWnd, _In_ UINT uIndex);
 static UINT WINAPI SetZoom(_In_ HWND hWnd, _In_ UINT uZoom);
 static BOOL WINAPI UpdateStatusFrameText(_In_ HWND hWnd);
 static BOOL WINAPI UpdateStatusSizeText(_In_ HWND hWnd);
@@ -134,6 +142,15 @@ TBBUTTON TOOLBARBUTTONS[] =
 	{ ID_TOOLBARZOOMOUT,   IDM_ZOOMOUT,   TBSTATE_ENABLED, BTNS_AUTOSIZE },
 	{ ID_TOOLBARZOOMIN,    IDM_ZOOMIN,    TBSTATE_ENABLED, BTNS_AUTOSIZE },
 	{ ID_TOOLBARZOOM,      IDM_ZOOM,      TBSTATE_ENABLED, BTNS_AUTOSIZE },
+};
+
+static const
+UINT ZOOMS[] =
+{
+	10,  25,  50,  75,
+	100, 125, 150, 175,
+	200, 250, 300, 400,
+	600, 800, 1200,
 };
 
 /*
@@ -192,7 +209,10 @@ LRESULT CALLBACK ViewerWindowProc(
 		nResult = 0;
 		break;
 	case WM_PARENTNOTIFY:
-		nResult = OnNotifyParent(hWnd, LOWORD(wParam), HIWORD(wParam), lParam) ? 0 : DefProc(hWnd, uMsg, wParam, lParam);
+		nResult = OnParentNotify(hWnd, LOWORD(wParam), HIWORD(wParam), lParam) ? 0 : DefProc(hWnd, uMsg, wParam, lParam);
+		break;
+	case WM_SETFRAMEINDEX:
+		nResult = SetFrameIndex(hWnd, (UINT)wParam);
 		break;
 	case WM_SETZOOM:
 		nResult = SetZoom(hWnd, (UINT)wParam);
@@ -445,7 +465,7 @@ BOOL WINAPI OnCommand(
 	_In_ HWND hWnd,
 	_In_ UINT uCommand)
 {
-	BOOL bResult = FALSE;
+	BOOL bResult;
 
 	switch (uCommand)
 	{
@@ -464,11 +484,17 @@ BOOL WINAPI OnCommand(
 	case IDM_TOOLBARWINDOW:
 		bResult = PostMessage(hWnd, WM_TOOLBARWINDOW, 0, 0);
 		break;
+	case IDM_ZOOM:
+		bResult = PostMessage(hWnd, WM_SETZOOM, DEFAULT_ZOOM, 0);
+		break;
 	case IDM_ZOOMIN:
 		bResult = PostMessage(hWnd, WM_ZOOM, TRUE, 0);
 		break;
 	case IDM_ZOOMOUT:
 		bResult = PostMessage(hWnd, WM_ZOOM, FALSE, 0);
+		break;
+	default:
+		bResult = FALSE;
 		break;
 	}
 
@@ -489,6 +515,7 @@ BOOL WINAPI OnCreate(
 	uDpi = GetDpiForWindow(hWnd);
 	SetWindowLong(hWnd, GWL_DPI, uDpi);
 	SetWindowLong(hWnd, GWL_FLAGS, uFlags);
+	SetWindowLong(hWnd, GWL_ZOOM, DEFAULT_ZOOM);
 	lpUserData = CreateUserData(hWnd);
 
 	if (lpUserData)
@@ -870,10 +897,38 @@ VOID WINAPI OnLoad(
 }
 
 /*
+開くダイアログ ボックスを表示します。
+*/
+static
+VOID WINAPI OnOpen(
+	_In_ HWND hWnd)
+{
+	LPUSERDATA pSelf;
+	OPENFILENAME ofn;
+	pSelf = (LPUSERDATA)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+
+	if (pSelf)
+	{
+		ZeroMemory(&ofn, sizeof ofn);
+		ofn.lStructSize = sizeof ofn;
+		ofn.hwndOwner = hWnd;
+		ofn.lpstrFilter = OPENFILEFILTER;
+		ofn.lpstrFile = pSelf->strFileName;
+		ofn.nMaxFile = PATHCCH_MAX_CCH;
+		ofn.Flags = OFN_ONOPEN;
+
+		if (GetOpenFileName(&ofn))
+		{
+			PostMessage(hWnd, WM_LOAD, 0, 0);
+		}
+	}
+}
+
+/*
 作成したウィンドウ ハンドルを保持します。
 */
 static
-BOOL WINAPI OnNotifyParent(
+BOOL WINAPI OnParentNotify(
 	_In_ HWND hWnd,
 	_In_ UINT uNotify,
 	_In_ UINT idChild,
@@ -922,34 +977,6 @@ BOOL WINAPI OnNotifyParent(
 	}
 
 	return bResult;
-}
-
-/*
-開くダイアログ ボックスを表示します。
-*/
-static
-VOID WINAPI OnOpen(
-	_In_ HWND hWnd)
-{
-	LPUSERDATA pSelf;
-	OPENFILENAME ofn;
-	pSelf = (LPUSERDATA)GetWindowLongPtr(hWnd, GWLP_USERDATA);
-
-	if (pSelf)
-	{
-		ZeroMemory(&ofn, sizeof ofn);
-		ofn.lStructSize = sizeof ofn;
-		ofn.hwndOwner = hWnd;
-		ofn.lpstrFilter = OPENFILEFILTER;
-		ofn.lpstrFile = pSelf->strFileName;
-		ofn.nMaxFile = PATHCCH_MAX_CCH;
-		ofn.Flags = OFN_ONOPEN;
-
-		if (GetOpenFileName(&ofn))
-		{
-			PostMessage(hWnd, WM_LOAD, 0, 0);
-		}
-	}
 }
 
 /*
@@ -1003,17 +1030,98 @@ VOID WINAPI OnZoom(
 	_In_ HWND hWnd,
 	_In_ BOOL bIncrement)
 {
-	int nResult, nZoom;
-	nZoom = GetWindowLong(hWnd, GWL_ZOOM);
-	nResult = DEFAULT_ZOOM + (bIncrement ? ZOOMFACTOR : -ZOOMFACTOR);
-	nResult = MulDiv(nZoom, nResult, DEFAULT_ZOOM);
-	nResult = max(nResult, MINZOOM);
-	nResult = min(nResult, MAXZOOM);
+	ZOOMSTRUCT Found;
+	LPUINT lpZoom;
+	UINT uZoom;
+	uZoom = GetWindowLong(hWnd, GWL_ZOOM);
+	ZeroMemory(&Found, sizeof Found);
+	Found.uNext = 0;
+	Found.uPrevious = MAXUINT;
+	lpZoom = bsearch_s(&uZoom, ZOOMS, ARRAYSIZE(ZOOMS), sizeof(int), OnZoomProc, &Found);
 
-	if (nResult != nZoom)
+	if (lpZoom)
 	{
-		PostMessage(hWnd, WM_SETZOOM, nResult, 0);
+		uZoom = (UINT)(lpZoom - ZOOMS);
+
+		if (bIncrement)
+		{
+			uZoom++;
+		}
+		else
+		{
+			uZoom--;
+		}
+		if (uZoom < ARRAYSIZE(ZOOMS))
+		{
+			uZoom = ZOOMS[uZoom];
+		}
+		else
+		{
+			uZoom = 0;
+		}
 	}
+	else if (bIncrement)
+	{
+		if (Found.uNext <= MAXZOOM)
+		{
+			uZoom = Found.uNext;
+		}
+		else
+		{
+			uZoom = 0;
+		}
+	}
+	else
+	{
+		if (Found.uPrevious >= MINZOOM)
+		{
+			uZoom = Found.uPrevious;
+		}
+		else
+		{
+			uZoom = 0;
+		}
+	}
+	if (uZoom)
+	{
+		SetZoom(hWnd, uZoom);
+	}
+}
+
+static
+int CDECL OnZoomProc(
+	_In_opt_ LPVOID lpContext,
+	_In_ LPCVOID lpKey,
+	_In_ LPCVOID lpValue)
+{
+	const UINT uKey = *(LPUINT)lpKey;
+	const UINT uValue = *(LPUINT)lpValue;
+	int nResult;
+
+	if (uKey < uValue)
+	{
+		nResult = -1;
+
+		if (lpContext)
+		{
+			((LPZOOMSTRUCT)lpContext)->uNext = uValue;
+		}
+	}
+	else if (uKey > uValue)
+	{
+		nResult = 1;
+
+		if (lpContext)
+		{
+			((LPZOOMSTRUCT)lpContext)->uPrevious = uValue;
+		}
+	}
+	else
+	{
+		nResult = 0;
+	}
+
+	return nResult;
 }
 
 /*
@@ -1087,48 +1195,14 @@ BOOL WINAPI ResizeWindow(
 	return MoveWindow(hWnd, X, Y, nWidth, nHeight, TRUE);
 }
 
-/*
-ステータス バーに値を表示します。
-*/
 static
-BOOL WINAPI SetStatusValue(
+UINT WINAPI SetFrameIndex(
 	_In_ HWND hWnd,
-	_In_ UINT uStatus,
-	_In_ LPARAM lParam)
+	_In_ UINT uIndex)
 {
-	HWND hWndStatus;
-	BOOL bResult;
-	TCHAR strText[LOADSTRING_MAX];
-	hWndStatus = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDSTATUS);
-
-	if (hWndStatus)
-	{
-		switch (uStatus)
-		{
-		case ID_STATUSFRAME:
-			bResult = SUCCEEDED(StringCchPrintf(strText, LOADSTRING_MAX, TEXT("Page: %u/%u"), LOWORD(lParam), HIWORD(lParam)));
-			break;
-		case ID_STATUSSIZE:
-			bResult = SUCCEEDED(StringCchPrintf(strText, LOADSTRING_MAX, TEXT("Size: (%u, %u)"), LOWORD(lParam), HIWORD(lParam)));
-			break;
-		case ID_STATUSZOOM:
-			bResult = SUCCEEDED(StringCchPrintf(strText, LOADSTRING_MAX, TEXT("Zoom: %u%%"), LOWORD(lParam)));
-			break;
-		default:
-			bResult = FALSE;
-			break;
-		}
-		if (bResult)
-		{
-			SendMessage(hWndStatus, SB_SETTEXT, uStatus, (LPARAM)strText);
-		}
-	}
-	else
-	{
-		bResult = FALSE;
-	}
-
-	return bResult;
+	uIndex = SetWindowLong(hWnd, GWL_FRAMEINDEX, uIndex);
+	UpdateStatusFrameText(hWnd);
+	return uIndex;
 }
 
 static
@@ -1136,8 +1210,9 @@ UINT WINAPI SetZoom(
 	_In_ HWND hWnd,
 	_In_ UINT uZoom)
 {
-	SetStatusValue(hWnd, ID_STATUSZOOM, uZoom);
-	return SetWindowLong(hWnd, GWL_ZOOM, uZoom);
+	uZoom = SetWindowLong(hWnd, GWL_ZOOM, uZoom);
+	UpdateStatusZoomText(hWnd);
+	return uZoom;
 }
 
 /*
