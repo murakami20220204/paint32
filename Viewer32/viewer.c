@@ -35,11 +35,11 @@ typedef struct tagWINDOWEXTRA
 	LONG dwZoom;
 } WINDOWEXTRA;
 
-typedef struct tagZOOMSTRUCT
+typedef struct tagZOOMCONTEXT
 {
 	UINT uNext;
 	UINT uPrevious;
-} ZOOMSTRUCT, FAR *LPZOOMSTRUCT;
+} ZOOMCONTEXT, FAR *LPZOOMCONTEXT;
 
 #define ALPHATHRESHOLDPERCENT   1.0
 #define CXTOOLBAR               32
@@ -566,10 +566,11 @@ VOID WINAPI OnDecode(
 	_In_ HWND hWnd)
 {
 	IWICBitmap *pBitmap;
+	IWICBitmapFlipRotator *pRotator;
 	IWICBitmapFrameDecode *pFrame;
 	IWICFormatConverter *pConverter;
 	IWICBitmapLock *pLock;
-	LPUSERDATA This;
+	LPUSERDATA pSelf;
 	LPBYTE lpBuffer;
 	HBITMAP hBitmap;
 	HDC hDC;
@@ -577,20 +578,20 @@ VOID WINAPI OnDecode(
 	BITMAPINFOHEADER bih;
 	HRESULT hResult;
 	UINT cbBuffer, uFrameIndex, uHeight, uWidth;
-	This = (LPUSERDATA)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	pSelf = (LPUSERDATA)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	uFrameIndex = GetWindowLong(hWnd, GWL_FRAMEINDEX);
 
-	if (This && This->pFactory && This->pDecoder)
+	if (pSelf && pSelf->pFactory && pSelf->pDecoder)
 	{
 		hDC = GetDC(hWnd);
 
 		if (hDC)
 		{
-			hResult = This->pDecoder->lpVtbl->GetFrame(This->pDecoder, uFrameIndex, &pFrame);
+			hResult = pSelf->pDecoder->lpVtbl->GetFrame(pSelf->pDecoder, uFrameIndex, &pFrame);
 
 			if (SUCCEEDED(hResult))
 			{
-				hResult = This->pFactory->lpVtbl->CreateFormatConverter(This->pFactory, &pConverter);
+				hResult = pSelf->pFactory->lpVtbl->CreateFormatConverter(pSelf->pFactory, &pConverter);
 
 				if (SUCCEEDED(hResult))
 				{
@@ -598,57 +599,69 @@ VOID WINAPI OnDecode(
 
 					if (SUCCEEDED(hResult))
 					{
-						hResult = This->pFactory->lpVtbl->CreateBitmapFromSource(This->pFactory, (IWICBitmapSource*)pConverter, WICBitmapCacheOnLoad, &pBitmap);
+						hResult = pSelf->pFactory->lpVtbl->CreateBitmapFlipRotator(pSelf->pFactory, &pRotator);
 
 						if (SUCCEEDED(hResult))
 						{
-							hResult = pBitmap->lpVtbl->Lock(pBitmap, NULL, WICBitmapLockRead, &pLock);
+							hResult = pRotator->lpVtbl->Initialize(pRotator, (IWICBitmapSource*)pConverter, WICBitmapTransformFlipVertical);
 
 							if (SUCCEEDED(hResult))
 							{
-								hResult = pLock->lpVtbl->GetSize(pLock, &uWidth, &uHeight);
+								hResult = pSelf->pFactory->lpVtbl->CreateBitmapFromSource(pSelf->pFactory, (IWICBitmapSource*)pRotator, WICBitmapCacheOnLoad, &pBitmap);
 
 								if (SUCCEEDED(hResult))
 								{
-									hResult = pLock->lpVtbl->GetDataPointer(pLock, &cbBuffer, &lpBuffer);
+									hResult = pBitmap->lpVtbl->Lock(pBitmap, NULL, WICBitmapLockRead, &pLock);
 
 									if (SUCCEEDED(hResult))
 									{
-										ZeroMemory(&bih, sizeof bih);
-										bih.biSize = sizeof bih;
-										bih.biWidth = uWidth;
-										bih.biHeight = uHeight;
-										bih.biPlanes = 1;
-										bih.biBitCount = 32;
-										bih.biSizeImage = cbBuffer;
-										hBitmap = (HBITMAP)GetWindowLongPtr(hWnd, GWLP_HBITMAP);
+										hResult = pLock->lpVtbl->GetSize(pLock, &uWidth, &uHeight);
 
-										if (hBitmap)
+										if (SUCCEEDED(hResult))
 										{
-											DeleteObject(hBitmap);
+											hResult = pLock->lpVtbl->GetDataPointer(pLock, &cbBuffer, &lpBuffer);
+
+											if (SUCCEEDED(hResult))
+											{
+												ZeroMemory(&bih, sizeof bih);
+												bih.biSize = sizeof bih;
+												bih.biWidth = uWidth;
+												bih.biHeight = uHeight;
+												bih.biPlanes = 1;
+												bih.biBitCount = 32;
+												bih.biSizeImage = cbBuffer;
+												hBitmap = (HBITMAP)GetWindowLongPtr(hWnd, GWLP_HBITMAP);
+
+												if (hBitmap)
+												{
+													DeleteObject(hBitmap);
+												}
+
+												hBitmap = CreateDIBitmap(hDC, &bih, CBM_INIT, lpBuffer, (LPBITMAPINFO)&bih, DIB_RGB_COLORS);
+
+												if (!hBitmap)
+												{
+													hResult = HRESULT_FROM_WIN32(GetLastError());
+												}
+
+												SetWindowLongPtr(hWnd, GWLP_HBITMAP, (LONG_PTR)hBitmap);
+												hWndPicture = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDPICTURE);
+
+												if (hWndPicture)
+												{
+													InvalidateRect(hWndPicture, NULL, TRUE);
+												}
+											}
 										}
 
-										hBitmap = CreateDIBitmap(hDC, &bih, CBM_INIT, lpBuffer, (LPBITMAPINFO)&bih, DIB_RGB_COLORS);
-
-										if (!hBitmap)
-										{
-											hResult = HRESULT_FROM_WIN32(GetLastError());
-										}
-
-										SetWindowLongPtr(hWnd, GWLP_HBITMAP, (LONG_PTR)hBitmap);
-										hWndPicture = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDPICTURE);
-
-										if (hWndPicture)
-										{
-											InvalidateRect(hWndPicture, NULL, TRUE);
-										}
+										pLock->lpVtbl->Release(pLock);
 									}
-								}
 
-								pLock->lpVtbl->Release(pLock);
+									pBitmap->lpVtbl->Release(pBitmap);
+								}
 							}
 
-							pBitmap->lpVtbl->Release(pBitmap);
+							pRotator->lpVtbl->Release(pRotator);
 						}
 					}
 
@@ -1030,14 +1043,13 @@ VOID WINAPI OnZoom(
 	_In_ HWND hWnd,
 	_In_ BOOL bIncrement)
 {
-	ZOOMSTRUCT Found;
+	ZOOMCONTEXT Context;
 	LPUINT lpZoom;
 	UINT uZoom;
 	uZoom = GetWindowLong(hWnd, GWL_ZOOM);
-	ZeroMemory(&Found, sizeof Found);
-	Found.uNext = 0;
-	Found.uPrevious = MAXUINT;
-	lpZoom = bsearch_s(&uZoom, ZOOMS, ARRAYSIZE(ZOOMS), sizeof(int), OnZoomProc, &Found);
+	Context.uNext = 0;
+	Context.uPrevious = MAXUINT;
+	lpZoom = bsearch_s(&uZoom, ZOOMS, ARRAYSIZE(ZOOMS), sizeof(int), OnZoomProc, &Context);
 
 	if (lpZoom)
 	{
@@ -1062,9 +1074,9 @@ VOID WINAPI OnZoom(
 	}
 	else if (bIncrement)
 	{
-		if (Found.uNext <= MAXZOOM)
+		if (Context.uNext <= MAXZOOM)
 		{
-			uZoom = Found.uNext;
+			uZoom = Context.uNext;
 		}
 		else
 		{
@@ -1073,9 +1085,9 @@ VOID WINAPI OnZoom(
 	}
 	else
 	{
-		if (Found.uPrevious >= MINZOOM)
+		if (Context.uPrevious >= MINZOOM)
 		{
-			uZoom = Found.uPrevious;
+			uZoom = Context.uPrevious;
 		}
 		else
 		{
@@ -1104,7 +1116,7 @@ int CDECL OnZoomProc(
 
 		if (lpContext)
 		{
-			((LPZOOMSTRUCT)lpContext)->uNext = uValue;
+			((LPZOOMCONTEXT)lpContext)->uNext = uValue;
 		}
 	}
 	else if (uKey > uValue)
@@ -1113,7 +1125,7 @@ int CDECL OnZoomProc(
 
 		if (lpContext)
 		{
-			((LPZOOMSTRUCT)lpContext)->uPrevious = uValue;
+			((LPZOOMCONTEXT)lpContext)->uPrevious = uValue;
 		}
 	}
 	else
@@ -1212,6 +1224,8 @@ UINT WINAPI SetZoom(
 {
 	uZoom = SetWindowLong(hWnd, GWL_ZOOM, uZoom);
 	UpdateStatusZoomText(hWnd);
+	hWnd = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDPICTURE);
+	InvalidateRect(hWnd, NULL, TRUE);
 	return uZoom;
 }
 
