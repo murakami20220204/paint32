@@ -15,63 +15,51 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Paint32.c">
+    <ClCompile Include="document.c">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="stdafx.c">
+    <ClCompile Include="frame.c">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="outline.c">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="color.c">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="palette.c">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="new.c">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="about.c">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="autosave.c">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="startup.c">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="winmain.c">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="app.c">
+    <ClCompile Include="main.c">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
+    <ClInclude Include="Paint.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Paint32.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Paint32.rc">
+    <ResourceCompile Include="Paint.rc">
       <Filter>リソース ファイル</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Paint32.ico">
+    <Image Include="frame.ico">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="toolbar0.bmp">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="toolbar1.bmp">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="toolbar2.bmp">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="toolbar3.bmp">
+      <Filter>リソース ファイル</Filter>
+    </Image>
+    <Image Include="document.ico">
       <Filter>リソース ファイル</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Manifest Include="Paint32.manifest">
+    <Manifest Include="Paint.manifest">
       <Filter>リソース ファイル</Filter>
     </Manifest>
   </ItemGroup>

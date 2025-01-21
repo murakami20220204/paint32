@@ -1,0 +1,313 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 日本語 (日本) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041104b0"
+        BEGIN
+            VALUE "CompanyName", "Taichi Murakami"
+            VALUE "FileDescription", "お絵かきソフト"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "Paint.exe"
+            VALUE "LegalCopyright", "Copyright © 2025 Taichi Murakami. All rights reserved."
+            VALUE "OriginalFilename", "Paint.exe"
+            VALUE "ProductName", "お絵かきソフト"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_FRAME MENU
+BEGIN
+    POPUP "ファイル(&F)"
+    BEGIN
+        MENUITEM "新規(&N)\tCtrl+N",              IDM_NEW
+        MENUITEM "開く(&O)...\tCtrl+O",           IDM_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "保存(&S)\tCtrl+S",              IDM_SAVE
+        MENUITEM "名前を付けて保存(&A)...\tCtrl+Shift+S", IDM_SAVEAS
+        MENUITEM "すべて保存(&L)",                   IDM_SAVEALL
+        MENUITEM SEPARATOR
+        MENUITEM "印刷(&P)...\tCtrl+P",           IDM_PRINT
+        MENUITEM "ページ設定(&G)...",                IDM_PAGESETUP
+        MENUITEM "環境設定(&F)...",                 IDM_PREFERENCES
+        MENUITEM SEPARATOR
+        MENUITEM "閉じる(&C)\tCtrl+F4",            IDM_CLOSE
+        MENUITEM "終了(&X)\tAlt+F4",              IDM_EXIT
+    END
+    POPUP "表示(&V)"
+    BEGIN
+        MENUITEM "ツールバー(&T)",                   IDM_TOOLBAR
+        MENUITEM "ステータス バー(&S)",                IDM_STATUS
+        MENUITEM SEPARATOR
+        MENUITEM "パレット ウィンドウ(&P)",              IDM_PALETTE
+        MENUITEM "レイヤー ウィンドウ(&L)",              IDM_LAYER
+    END
+    POPUP "ウィンドウ(&W)"
+    BEGIN
+        MENUITEM "重ねて表示(&C)",                   IDM_CASCADE
+        MENUITEM "水平に並べて表示(&H)",                IDM_TILEHORZ
+        MENUITEM "垂直に並べて表示(&V)",                IDM_TILEVERT
+        MENUITEM "アイコンを整列(&I)",                 IDM_ICONARRANGE
+        MENUITEM SEPARATOR
+        MENUITEM "すべて閉じる(&L)",                  IDM_CLOSEALL
+    END
+    POPUP "ヘルプ(&H)"
+    BEGIN
+        MENUITEM "バージョン情報(&A)",                 IDM_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUT DIALOGEX 0, 0, 215, 95
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "バージョン情報"
+FONT 9, "MS Shell Dlg", 400, 0, 0x80
+BEGIN
+    ICON            IDI_FRAME,IDC_STATIC,7,7,20,20
+    LTEXT           "お絵かきソフト\r\nCopyright © 2025 Taichi Murakami. All rights reserved.",IDC_STATIC,57,7,151,59
+    DEFPUSHBUTTON   "閉じる",IDOK,158,73,50,15
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 208
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 88
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_ABOUT AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_PAINT               "お絵かきソフト"
+    IDS_UNTITLED            "(無題)"
+END
+
+#endif    // 日本語 (日本) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 英語 (米国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_FRAME MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                IDM_NEW
+        MENUITEM "&Open...\tCtrl+O",            IDM_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "&Save\tCtrl+S",               IDM_SAVE
+        MENUITEM "Save &as...\tCtrl+Shift+S",   IDM_SAVEAS
+        MENUITEM "Save &all",                   IDM_SAVEALL
+        MENUITEM SEPARATOR
+        MENUITEM "&Print...\tCtrl+P",           IDM_PRINT
+        MENUITEM "Pa&ge setup...",              IDM_PAGESETUP
+        MENUITEM "Pre&ferences...",             IDM_PREFERENCES
+        MENUITEM SEPARATOR
+        MENUITEM "&Close\tCtrl+F4",             IDM_CLOSE
+        MENUITEM "E&xit\tAlt+F4",               IDM_EXIT
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Toolbar",                    IDM_TOOLBAR
+        MENUITEM "&Status",                     IDM_STATUS
+        MENUITEM SEPARATOR
+        MENUITEM "&Palette window",             IDM_PALETTE
+        MENUITEM "&Layer window",               IDM_LAYER
+    END
+    POPUP "&Window"
+    BEGIN
+        MENUITEM "&Cascade",                    IDM_CASCADE
+        MENUITEM "Tile &horizontal",            IDM_TILEHORZ
+        MENUITEM "Tile &vertical",              IDM_TILEVERT
+        MENUITEM "&Icon arrange",               IDM_ICONARRANGE
+        MENUITEM SEPARATOR
+        MENUITEM "Close &all",                  IDM_CLOSEALL
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About",                      IDM_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_FRAME               ICON                    "frame.ico"
+
+IDI_DOCUMENT            ICON                    "document.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_FRAME ACCELERATORS
+BEGIN
+    "N",            IDM_NEW,                VIRTKEY, CONTROL, NOINVERT
+    "O",            IDM_OPEN,               VIRTKEY, CONTROL, NOINVERT
+    "P",            IDM_PRINT,              VIRTKEY, CONTROL, NOINVERT
+    "S",            IDM_SAVE,               VIRTKEY, CONTROL, NOINVERT
+    "S",            IDM_SAVEAS,             VIRTKEY, SHIFT, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_TOOLBARSMALLHOT     BITMAP                  "toolbar0.bmp"
+
+IDB_TOOLBARSMALL        BITMAP                  "toolbar1.bmp"
+
+IDB_TOOLBARLARGEHOT     BITMAP                  "toolbar2.bmp"
+
+IDB_TOOLBARLARGE        BITMAP                  "toolbar3.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDS_PAINT               "Paint"
+    IDS_UNTITLED            "(Untitled)"
+END
+
+#endif    // 英語 (米国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
