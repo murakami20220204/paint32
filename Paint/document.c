@@ -68,6 +68,7 @@ static VOID WINAPI OnGetMinMaxInfo(_In_ HWND hWnd, _Inout_ LPMINMAXINFO lpInfo);
 static VOID WINAPI OnLayout(_In_ HWND hWnd);
 static BOOL WINAPI OnParentNotify(_In_ HWND hWnd, _In_ UINT uNotify, _In_ UINT idChild, _In_ LPARAM lParam);
 static VOID WINAPI OnSize(_In_ HWND hWnd, _In_ UINT uReason);
+static LRESULT WINAPI SendFrameMessage(_In_ HWND hWnd, _In_ UINT uMsg, _In_ WPARAM wParam, _In_ LPARAM lParam);
 
 #define CreateCanvas(hWnd) CreateChild(WS_EX_HWNDCANVAS, CANVASCLASSNAME, WS_HWNDCANVAS, (hWnd), ID_HWNDCANVAS)
 #define CreateLayerComboBox(hWnd) CreateChild(WS_EX_HWNDLAYER, WC_COMBOBOX, WS_HWNDLAYER, (hWnd), ID_HWNDLAYER)
@@ -115,6 +116,11 @@ LRESULT CALLBACK DocumentWindowProc(
 		OnSize(hWnd, LOWORD(wParam));
 		nResult = DefProc(hWnd, uMsg, wParam, lParam);
 		break;
+	case WM_MDIACTIVATE:
+	case WM_SETTEXT:
+		SendFrameMessage(hWnd, WM_DOCUMENTCHANGED, uMsg, (LPARAM)hWnd);
+		nResult = DefProc(hWnd, uMsg, wParam, lParam);
+		break;
 	default:
 		nResult = DefProc(hWnd, uMsg, wParam, lParam);
 		break;
@@ -145,6 +151,8 @@ BOOL WINAPI OnCreate(
 	_In_ CONST CREATESTRUCT FAR *lpParam)
 {
 	SetWindowLong(hWnd, GWL_DPI, GetDpiForWindow(hWnd));
+	SetWindowLongPtr(hWnd, GWLP_HWNDFRAME, (LONG_PTR)((LPDOCUMENTCREATESTRUCT)((LPMDICREATESTRUCT)lpParam->lpCreateParams)->lParam)->hWndFrame);
+	SendFrameMessage(hWnd, WM_DOCUMENTCHANGED, WM_CREATE, (LPARAM)hWnd);
 	return TRUE;
 }
 
@@ -156,6 +164,7 @@ static
 VOID WINAPI OnDestroy(
 	_In_ HWND hWnd)
 {
+	SendFrameMessage(hWnd, WM_DOCUMENTCHANGED, WM_DESTROY, (LPARAM)hWnd);
 }
 
 /*
@@ -228,6 +237,9 @@ VOID WINAPI OnLayout(
 	}
 }
 
+/*
+WM_PARENTNOTIFY:
+*/
 static
 BOOL WINAPI OnParentNotify(
 	_In_ HWND hWnd,
@@ -312,6 +324,9 @@ BOOL WINAPI OnParentNotify(
 	return bResult;
 }
 
+/*
+WM_SIZE:
+*/
 static
 VOID WINAPI OnSize(
 	_In_ HWND hWnd,
@@ -324,4 +339,26 @@ VOID WINAPI OnSize(
 		SendMessage(hWnd, WM_LAYOUT, 0, 0);
 		break;
 	}
+}
+
+static
+LRESULT WINAPI SendFrameMessage(
+	_In_ HWND hWnd,
+	_In_ UINT uMsg,
+	_In_ WPARAM wParam,
+	_In_ LPARAM lParam)
+{
+	LRESULT nResult;
+	hWnd = (HWND)GetWindowLongPtr(hWnd, GWLP_HWNDFRAME);
+
+	if (hWnd)
+	{
+		nResult = SendMessage(hWnd, uMsg, wParam, lParam);
+	}
+	else
+	{
+		nResult = 0;
+	}
+
+	return nResult;
 }

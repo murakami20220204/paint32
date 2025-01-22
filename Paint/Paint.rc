@@ -110,6 +110,7 @@ BEGIN
     BEGIN
         MENUITEM "ツールバー(&T)",                   IDM_TOOLBAR
         MENUITEM "ステータス バー(&S)",                IDM_STATUS
+        MENUITEM "タブ コントロール(&C)",               IDM_TABCTRL
         MENUITEM SEPARATOR
         MENUITEM "パレット ウィンドウ(&P)",              IDM_PALETTE
         MENUITEM "レイヤー ウィンドウ(&L)",              IDM_LAYER
@@ -223,7 +224,8 @@ BEGIN
     POPUP "&View"
     BEGIN
         MENUITEM "&Toolbar",                    IDM_TOOLBAR
-        MENUITEM "&Status",                     IDM_STATUS
+        MENUITEM "&Status bar",                 IDM_STATUS
+        MENUITEM "Tab &control",                IDM_TABCTRL
         MENUITEM SEPARATOR
         MENUITEM "&Palette window",             IDM_PALETTE
         MENUITEM "&Layer window",               IDM_LAYER

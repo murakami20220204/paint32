@@ -10,15 +10,16 @@ Paint プロジェクト内で外部リンケージを持つ関数を公開し�
 #define DOCUMENTCLASSNAME       TEXT("Document")
 #define MDICLIENTCLASSNAME      TEXT("MDIClient")
 #define FRAMECLASSNAME          TEXT("Paint")
+#define WM_DOCUMENTCHANGED      0x8000
 
 #ifdef _WIN64
 #define CANVASWINDOWEXTRA       0
 #define DOCUMENTWINDOWEXTRA     80
-#define FRAMEWINDOWEXTRA        56
+#define FRAMEWINDOWEXTRA        64
 #else
 #define CANVASWINDOWEXTRA       0
 #define DOCUMENTWINDOWEXTRA     36
-#define FRAMEWINDOWEXTRA        40
+#define FRAMEWINDOWEXTRA        44
 #endif
 
 typedef struct tagDOCUMENTCREATESTRUCT
